@@ -6,48 +6,48 @@ import (
 )
 
 type SplitEntity struct {
-	ID          string    `gorm:"primaryKey" json:"id"`
-	OwnerID     string    `json:"owner_id"`
-	OwnerDetail User      `json:"owner_detail" gorm:"foreignKey:OwnerID;-:migration"`
-	SplitMates  string    `json:"split_mates"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID        string          `gorm:"primaryKey" json:"id"`
+	Data      json.RawMessage `gorm:"type:json" json:"data"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+}
+type Data struct {
+	ID      string   `json:"id"`
+	Name    string   `json:"name"`
+	Email   string   `json:"email"`
+	Friends []Friend `json:"friends"`
+	Bank    struct {
+		Bank            string `json:"bank"`
+		BankAccountName string `json:"bankAccountName"`
+		BankNumber      string `json:"bankNumber"`
+	} `json:"bank"`
+	CreatedAt time.Time `json:"createdAt"`
+	Bills     []Bill    `json:"bills"`
 }
 
-type Split struct {
-	ID          string      `json:"id"`
-	OwnerID     string      `json:"owner_id"`
-	OwnerDetail User        `json:"owner_detail" gorm:"foreignKey:OwnerID;-:migration"`
-	SplitMates  []SplitMate `json:"split_mates"`
-	CreatedAt   time.Time   `json:"created_at"`
+type Friend struct {
+	ID        string       `json:"id"`
+	Name      string       `json:"name"`
+	Me        bool         `json:"me"`
+	CreatedAt time.Time    `json:"createdAt"`
+	Items     []FriendItem `json:"items"`
 }
 
-type SplitMate struct {
-	ID         string      `json:"id"`
-	Name       string      `json:"name"`
-	GrandTotal int         `json:"grand_total"`
-	SplitItems []SplitItem `json:"split_items"`
+type FriendItem struct {
+	BillID    string    `json:"billID"`
+	BillName  string    `json:"billName"`
+	Price     int       `json:"price"`
+	Qty       int       `json:"qty"`
+	SubTotal  int       `json:"subTotal"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
-type SplitItem struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Qty   int    `json:"qty"`
-	Price int    `json:"price"`
-	Total int    `json:"total"`
-}
-
-func (s *Split) ToEntity() SplitEntity {
-	json, err := json.Marshal(s.SplitMates)
-	if err != nil {
-		return SplitEntity{}
-	}
-
-	split := SplitEntity{
-		ID:          s.ID,
-		OwnerID:     s.OwnerID,
-		OwnerDetail: s.OwnerDetail,
-		SplitMates:  string(json),
-	}
-
-	return split
+type Bill struct {
+	ID           string    `json:"id"`
+	OwnerID      string    `json:"ownerID"`
+	Name         string    `json:"name"`
+	Qty          int       `json:"qty"`
+	Price        int       `json:"price"`
+	CreatedAt    time.Time `json:"createdAt"`
+	SplitPayment bool      `json:"splitPayment"`
 }

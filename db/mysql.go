@@ -30,7 +30,7 @@ func NewMysql() *gorm.DB {
 		},
 	)
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true&loc=Local&tls=true&interpolateParams=true", config.MysqlUser(), config.MysqlPassword(), config.MysqlHost(), config.MysqlDB())
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.MysqlUser(), config.MysqlPassword(), config.MysqlHost(), config.MysqlDB())
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: gormLogger,
 	})

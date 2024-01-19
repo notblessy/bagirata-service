@@ -18,26 +18,6 @@ func New(h *handler.Handler) *HTTPService {
 
 func (h *HTTPService) Routes(route *echo.Echo) {
 	v1 := route.Group("/v1")
-	v1.POST("/splits/:owner_id", h.handler.SplitBill)
-	v1.GET("/splits/:id", h.handler.FindSplit)
-
-	bill := v1.Group("/bills")
-	bill.GET("", h.handler.FindAllBill)
-	bill.POST("", h.handler.CreateBill)
-	bill.DELETE("/:id", h.handler.DeleteBill)
-
-	share := v1.Group("/shares")
-	share.POST("", h.handler.CreateShare)
-	share.GET("", h.handler.FindAllWithShare)
-	share.POST("/bulk", h.handler.BulkCreateShare)
-
-	user := v1.Group("/users")
-	user.POST("", h.handler.CreateUser)
-	user.POST("/mates", h.handler.CreateMates)
-	user.GET("/:id", h.handler.FindOneUser)
-	user.DELETE("/:mate_id/mate", h.handler.DeleteMate)
-
-	bank := v1.Group("/banks")
-	bank.POST("", h.handler.CreateBank)
-	bank.DELETE("/:id", h.handler.DeleteBank)
+	v1.POST("/splits", h.handler.Create)
+	v1.GET("/splits/:id", h.handler.Find)
 }
