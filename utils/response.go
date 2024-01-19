@@ -2,6 +2,8 @@ package utils
 
 import (
 	"encoding/json"
+	"math/rand"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,6 +24,18 @@ func Response(c echo.Context, status int, response *HTTPResponse) error {
 	}
 
 	return c.JSON(status, response)
+}
+
+func GenerateID(length int) string {
+	rand.NewSource(time.Now().UnixNano())
+
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	id := make([]byte, length)
+	for i := range id {
+		id[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(id)
 }
 
 func Dump(v interface{}) string {

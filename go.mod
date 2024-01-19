@@ -49,6 +49,7 @@ require (
 
 require (
 	github.com/go-playground/validator/v10 v10.16.0
+	github.com/oklog/ulid v1.3.1
 	github.com/spf13/viper v1.17.0
 	golang.org/x/sys v0.14.0 // indirect
 	gorm.io/driver/mysql v1.5.2

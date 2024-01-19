@@ -30,6 +30,10 @@ func (h *Handler) Create(c echo.Context) error {
 		})
 	}
 
+	if req.ID == "" {
+		req.ID = utils.GenerateID(10)
+	}
+
 	err := h.db.Save(&req).Error
 	if err != nil {
 		return utils.Response(c, http.StatusInternalServerError, &utils.HTTPResponse{
