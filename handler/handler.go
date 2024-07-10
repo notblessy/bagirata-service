@@ -75,14 +75,59 @@ func (h *Handler) Recognize(c echo.Context) error {
 
 	recognized.ID = uuid.New().String()
 
-	r := map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"success": true,
 		"message": "success",
 		"data":    recognized,
+	})
+}
+
+func (h *Handler) SaveSplit(c echo.Context) error {
+	var splitted model.Splitted
+
+	if err := c.Bind(&splitted); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": fmt.Errorf("failed to bind request: %w", err).Error,
+			"data":    nil,
+		})
 	}
 
-	js, _ := json.MarshalIndent(r, "", "    ")
-	fmt.Println(string(js))
+	entity := splitted.ToData()
 
-	return c.JSON(http.StatusOK, r)
+	err := h.db.Save(&entity).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": fmt.Errorf("failed to create splitted: %w", err).Error,
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "success",
+		"data":    splitted.Slug,
+	})
+}
+
+func (h *Handler) FindSplitBySlug(c echo.Context) error {
+	slug := c.Param("slug")
+
+	var splitted model.SplitEntity
+
+	err := h.db.Where("slug = ?", slug).First(&splitted).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": fmt.Errorf("failed to find splitted by slug: %w", err).Error,
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "success",
+		"data":    splitted.Data,
+	})
 }
