@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/notblessy/db"
 	"github.com/notblessy/handler"
-	"github.com/notblessy/model"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -18,12 +17,11 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db := db.NewPostgres()
-	db.AutoMigrate(&model.SplitEntity{})
+	supabase := db.NewSupabase()
 
 	openAi := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
-	handler := handler.NewHandler(db, openAi)
+	handler := handler.NewHandler(supabase, openAi)
 
 	e := echo.New()
 	e.POST("/v1/recognize", handler.Recognize)
@@ -31,5 +29,5 @@ func main() {
 	e.GET("/v1/splits/:slug", handler.FindSplitBySlug)
 	e.POST("/v1/splits", handler.SaveSplit)
 
-	e.Logger.Fatal(e.Start(":3200"))
+	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

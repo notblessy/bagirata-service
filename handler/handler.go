@@ -10,17 +10,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/notblessy/model"
 	"github.com/sashabaranov/go-openai"
-	"gorm.io/gorm"
+	"github.com/supabase-community/supabase-go"
 )
 
 type Handler struct {
-	db     *gorm.DB
+	sb     *supabase.Client
 	openAi *openai.Client
 }
 
-func NewHandler(db *gorm.DB, openAi *openai.Client) *Handler {
+func NewHandler(sb *supabase.Client, openAi *openai.Client) *Handler {
 	return &Handler{
-		db:     db,
+		sb:     sb,
 		openAi: openAi,
 	}
 }
@@ -95,11 +95,11 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 
 	entity := splitted.ToData()
 
-	err := h.db.Save(&entity).Error
+	_, _, err := h.sb.From("splits").Insert(entity, false, "", "", "").Execute()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to create splitted: %w", err).Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -116,11 +116,21 @@ func (h *Handler) FindSplitBySlug(c echo.Context) error {
 
 	var splitted model.SplitEntity
 
-	err := h.db.Where("slug = ?", slug).First(&splitted).Error
+	// find by slug to supabase
+	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to find splitted by slug: %w", err).Error,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+
+	err = json.Unmarshal(data, &splitted)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
