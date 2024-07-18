@@ -14,11 +14,24 @@ type SplittedOther struct {
 	Type   string `json:"type"`
 }
 
+func (so SplittedOther) FormattedAmount() string {
+	return formatCurrency(so.Amount)
+}
+
 type SplittedItem struct {
 	Name  string `json:"name"`
 	ID    string `json:"id"`
 	Price int    `json:"price"`
+	Equal bool   `json:"equal"`
 	Qty   int    `json:"qty"`
+}
+
+func (si SplittedItem) FormattedQty() string {
+	return fmt.Sprintf("x%d", si.Qty)
+}
+
+func (si SplittedItem) FormattedPrice() string {
+	return formatCurrency(si.Price)
 }
 
 type SplittedFriend struct {
@@ -60,6 +73,10 @@ type Splitted struct {
 	BankNumber  string           `json:"bankNumber"`
 	CreatedAt   time.Time        `json:"createdAt"`
 	GrandTotal  int              `json:"grandTotal"`
+}
+
+func (s Splitted) TotalFriends() int {
+	return len(s.Friends)
 }
 
 func (s Splitted) FormattedCreatedAt() string {

@@ -10,15 +10,9 @@
   <body>
     <div class="container">
       <div class="navigation-stack">
-        <div class="toolbar">
-          <button class="toolbar-item" id="historyButton">
-            <span class="icon">&lt;</span>
-            History
-          </button>
-          <div class="toolbar-item" id="progressIndicator">
-            <!-- Progress will show here -->
-          </div>
-          <button class="toolbar-item" id="shareButton">Share</button>
+        <div class="image-container">
+          <img src="/static/logo.png" alt="Bagirata Logo" />
+          <p>Bagirata</p>
         </div>
         <div class="content">
           <div class="header">
@@ -28,47 +22,68 @@
                 {{ .data.FormattedCreatedAt }}
               </p>
             </div>
-            <div class="header-amount gray-text" id="splitAmount">
+            <div class="header-amount price-text" id="splitAmount">
               {{ .data.FormattedGrandTotal }}
             </div>
           </div>
           <div class="list">
-            <div class="transfer-info-section">
-              <h2>Transfer Information</h2>
+            <div class="transfer-info-section" style="padding: 0 20px">
+              <p class="section-title">Transfer Information</p>
               <button class="transfer-info" id="copyButton">
                 <div class="bank-details">
-                  <p class="bold-text" id="bankName">{{ .data.BankName }}</p>
+                  <p class="p bold text-sm" id="bankName">
+                    {{ .data.BankName }}
+                  </p>
                   <div class="bank-number">
-                    <p id="bankNumber">{{ .data.BankNumber }}</p>
+                    <p id="bankNumber" class="p text-sm">
+                      {{ .data.BankNumber }}
+                    </p>
                     <span class="icon">📋</span>
                   </div>
-                  <p class="gray-text" id="accountName">
-                    {{ .data.BankAccount }}
-                  </p>
+                  <p class="p gray" id="accountName">{{ .data.BankAccount }}</p>
                 </div>
               </button>
             </div>
             <div class="split-section">
-              <h2>Bagirata Split</h2>
+              <h2 style="padding: 0 20px">Bagirata Split</h2>
               <!-- Friends list will be populated here -->
 
               <!-- below this should loop data.Friends and add class friend with its child, loop with go html tag -->
               {{ range .data.Friends }}
-              <div class="friend" id="friendTemplate">
+              <div class="friend" id="{{.Name}}">
                 <div class="friend-info">
-                  <div class="avatar">{{ .InitialName }}</div>
+                  <div
+                    class="avatar"
+                    style="background-color: {{ .AccentColor }};"
+                  >
+                    {{ .InitialName }}
+                  </div>
                   <div class="friend-details">
                     <div class="friend-header">
-                      <span class="friend-name">{{ .Name }}</span>
-                      <span class="friend-amount">{{ .FormattedTotal }}</span>
+                      <span class="p text-lg">{{ .Name }}</span>
+                      <span class="p text-lg">{{ .FormattedTotal }}</span>
                     </div>
                     {{ range .Items }}
-                    <div class="friend-items">
-                      <div class="item-name">{{ .Name }}</div>
+                    <div class="sub-payment">
+                      <div class="p text-xs gray">{{ .Name }}</div>
+                      <div class="sub-price">
+                        {{if .Equal}}
+                        <div class="p text-xs gray">
+                          {{ .Qty }}/{{ $.data.TotalFriends }}
+                        </div>
+                        {{else}}
+                        <div class="p text-xs gray">{{ .FormattedQty }}</div>
+                        {{end}}
+
+                        <div class="p text-xs gray">{{ .FormattedPrice }}</div>
+                      </div>
                     </div>
                     {{ end }} {{ range .Others}}
-                    <div class="friend-others">
-                      <div class="others-name">{{ .Name }}</div>
+                    <div class="sub-payment">
+                      <div class="p text-xs gray">{{ .Name }}</div>
+                      <div class="sub-price">
+                        <div class="p text-xs gray">{{ .FormattedAmount }}</div>
+                      </div>
                     </div>
                     {{ end }}
                   </div>
@@ -79,12 +94,15 @@
           </div>
         </div>
         <div id="alert" class="alert hidden">
-          <p id="alertMessage">Alert Message</p>
-          <button id="alertDismiss">Dismiss</button>
+          <div class="alert-message">
+            <p style="padding-bottom: 5px" class="p pgap text-lg">Success</p>
+            <p class="p pgap text-sm gray">Number copied to clipboard!</p>
+          </div>
+          <button id="alertDismiss" class="alertButton">Dismiss</button>
         </div>
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/static/script.js"></script>
   </body>
 </html>

@@ -147,8 +147,6 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 
 	var splitted model.SplitEntity
 
-	fmt.Println("slug", slug)
-
 	// find by slug to supabase
 	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
 	if err != nil {
