@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"text/template"
 
@@ -45,6 +46,8 @@ func main() {
 
 	e.Use(middleware.Logger())
 
+	e.RouteNotFound("*", notFound)
+
 	e.GET("/:slug", handler.ViewSplitBySlug)
 
 	e.POST("/v1/recognize", handler.Recognize)
@@ -53,4 +56,8 @@ func main() {
 	e.POST("/v1/splits", handler.SaveSplit)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+}
+
+func notFound(c echo.Context) error {
+	return c.Render(http.StatusNotFound, "404.html", nil)
 }
