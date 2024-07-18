@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  app:
+    container_name: bagirata-app
+    tty: true
+    build: .
+    ports:
+      - 3200:3200
+    restart: on-failure
+    volumes:
+      - .:/app
+    networks:
+      - bagirata_network
+networks:
+  bagirata_network:
+    driver: bridge
