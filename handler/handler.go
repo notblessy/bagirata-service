@@ -95,7 +95,7 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 
 	entity := splitted.ToData()
 
-	_, _, err := h.sb.From("splits").Insert(entity, false, "", "", "").Execute()
+	_, _, err := h.sb.From("splits").Upsert(entity, "", "", "").Execute()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": false,
@@ -139,5 +139,46 @@ func (h *Handler) FindSplitBySlug(c echo.Context) error {
 		"success": true,
 		"message": "success",
 		"data":    splitted.Data,
+	})
+}
+
+func (h *Handler) ViewSplitBySlug(c echo.Context) error {
+	slug := c.Param("slug")
+
+	var splitted model.SplitEntity
+
+	fmt.Println("slug", slug)
+
+	// find by slug to supabase
+	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+
+	err = json.Unmarshal(data, &splitted)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+
+	var splittedData model.Splitted
+	err = json.Unmarshal(splitted.Data, &splittedData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+
+	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
+		"data": splittedData,
 	})
 }

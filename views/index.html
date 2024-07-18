@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bagirata - Split</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="navigation-stack">
+        <div class="toolbar">
+          <button class="toolbar-item" id="historyButton">
+            <span class="icon">&lt;</span>
+            History
+          </button>
+          <div class="toolbar-item" id="progressIndicator">
+            <!-- Progress will show here -->
+          </div>
+          <button class="toolbar-item" id="shareButton">Share</button>
+        </div>
+        <div class="content">
+          <div class="header">
+            <div class="header-text">
+              <h1 id="splitName">{{ .data.Name }}</h1>
+              <p id="splitDate" class="gray-text">
+                {{ .data.FormattedCreatedAt }}
+              </p>
+            </div>
+            <div class="header-amount gray-text" id="splitAmount">
+              {{ .data.FormattedGrandTotal }}
+            </div>
+          </div>
+          <div class="list">
+            <div class="transfer-info-section">
+              <h2>Transfer Information</h2>
+              <button class="transfer-info" id="copyButton">
+                <div class="bank-details">
+                  <p class="bold-text" id="bankName">{{ .data.BankName }}</p>
+                  <div class="bank-number">
+                    <p id="bankNumber">{{ .data.BankNumber }}</p>
+                    <span class="icon">📋</span>
+                  </div>
+                  <p class="gray-text" id="accountName">
+                    {{ .data.BankAccount }}
+                  </p>
+                </div>
+              </button>
+            </div>
+            <div class="split-section">
+              <h2>Bagirata Split</h2>
+              <!-- Friends list will be populated here -->
+
+              <!-- below this should loop data.Friends and add class friend with its child, loop with go html tag -->
+              {{ range .data.Friends }}
+              <div class="friend" id="friendTemplate">
+                <div class="friend-info">
+                  <div class="avatar">{{ .InitialName }}</div>
+                  <div class="friend-details">
+                    <div class="friend-header">
+                      <span class="friend-name">{{ .Name }}</span>
+                      <span class="friend-amount">{{ .FormattedTotal }}</span>
+                    </div>
+                    {{ range .Items }}
+                    <div class="friend-items">
+                      <div class="item-name">{{ .Name }}</div>
+                    </div>
+                    {{ end }} {{ range .Others}}
+                    <div class="friend-others">
+                      <div class="others-name">{{ .Name }}</div>
+                    </div>
+                    {{ end }}
+                  </div>
+                </div>
+              </div>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+        <div id="alert" class="alert hidden">
+          <p id="alertMessage">Alert Message</p>
+          <button id="alertDismiss">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

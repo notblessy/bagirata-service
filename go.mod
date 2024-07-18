@@ -5,6 +5,7 @@ go 1.21.4
 require gorm.io/gorm v1.25.10
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/supabase-community/supabase-go v0.0.4 // indirect
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 )
 
 require (
