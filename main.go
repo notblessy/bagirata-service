@@ -26,7 +26,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("[WARNING] Error loading .env file")
 	}
 
 	supabase := db.NewSupabase()
@@ -45,6 +45,13 @@ func main() {
 	e.Renderer = t
 
 	e.Use(middleware.Logger())
+	e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
+		Skipper: middleware.DefaultSkipper,
+		Store:   middleware.NewRateLimiterMemoryStore(20),
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			return c.RealIP(), nil
+		},
+	}))
 
 	e.RouteNotFound("*", notFound)
 

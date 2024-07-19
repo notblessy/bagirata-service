@@ -1,14 +1,14 @@
-FROM golang:1.21
+FROM golang:1.21 AS builder
 
-RUN mkdir /app
 WORKDIR /app
-
 COPY . .
-# COPY .env .
 
-RUN go mod tidy
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main
+RUN CGO_ENABLED=0 GOOS=linux go build -o main
 
-EXPOSE 3200
+FROM gcr.io/distroless/static
+WORKDIR /app
+COPY --from=builder /app/main .
 
-CMD ["/main"]
+USER 65532:65532
+
+ENTRYPOINT ["./main"]
