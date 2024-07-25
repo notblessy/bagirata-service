@@ -168,3 +168,11 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 		"data": splittedData,
 	})
 }
+
+func (h *Handler) ViewPrivacyPolicy(c echo.Context) error {
+	return c.Render(http.StatusOK, "privacy.html", nil)
+}
+
+func (h *Handler) ViewLandingPage(c echo.Context) error {
+	return c.Render(http.StatusOK, "landing.html", nil)
+}
