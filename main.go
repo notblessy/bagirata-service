@@ -55,6 +55,7 @@ func main() {
 
 	e.RouteNotFound("*", notFound)
 
+	e.GET("/", handler.ViewLandingPage)
 	e.GET("/:slug", handler.ViewSplitBySlug)
 	e.GET("/support/privacy", handler.ViewPrivacyPolicy)
 
