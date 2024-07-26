@@ -84,15 +84,11 @@
                     <div class="sub-payment">
                       <div class="p text-xs gray">{{ .Name }}</div>
                       <div class="sub-price">
-                        {{if .HasFormula}} {{if .IsTax}}
+                        {{if .HasFormula}}
                         <div class="p text-xs gray">
-                          {{ .GetFormula $friend.Total }}
+                          {{ .GetFormula $friend.Subtotal }}
                         </div>
-                        {{ end }} {{if .IsDiscount}}
-                        <div class="p text-xs gray">
-                          {{ .GetFormula $.data.Subtotal }}
-                        </div>
-                        {{ end }} {{ end }}
+                        {{ end }}
                         <div class="p text-xs gray">{{ .FormattedPrice }}</div>
                       </div>
                     </div>

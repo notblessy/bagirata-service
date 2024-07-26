@@ -16,7 +16,7 @@ type SplittedOther struct {
 }
 
 func (so SplittedOther) HasFormula() bool {
-	return so.Type == "tax" || so.Type == "discount"
+	return so.Type == "tax"
 }
 
 func (so SplittedOther) IsTax() bool {
@@ -28,12 +28,15 @@ func (so SplittedOther) IsDiscount() bool {
 }
 
 func (so SplittedOther) FormattedPrice() string {
+	if so.Type == "deduction" || so.Type == "discount" {
+		return fmt.Sprintf("-%s", formatCurrency(so.Price))
+	}
+
 	return formatCurrency(so.Price)
 }
 
 func (so SplittedOther) GetFormula(multiplier float64) string {
-	multiplierAmount := multiplier - so.Price
-	return fmt.Sprintf("%d%% * %s", int64(so.Amount), formatCurrency(multiplierAmount))
+	return fmt.Sprintf("%d%% * %s", int64(so.Amount), formatCurrency(multiplier))
 }
 
 type SplittedItem struct {
@@ -54,6 +57,7 @@ func (si SplittedItem) FormattedPrice() string {
 
 type SplittedFriend struct {
 	Total       float64         `json:"total"`
+	Subtotal    float64         `json:"subTotal"`
 	ID          string          `json:"id"`
 	Name        string          `json:"name"`
 	FriendID    string          `json:"friendId"`
