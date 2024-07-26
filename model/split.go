@@ -8,11 +8,11 @@ import (
 )
 
 type SplittedOther struct {
-	Name   string `json:"name"`
-	ID     string `json:"id"`
-	Amount int    `json:"amount"`
-	Price  int    `json:"price"`
-	Type   string `json:"type"`
+	Name   string  `json:"name"`
+	ID     string  `json:"id"`
+	Amount float64 `json:"amount"`
+	Price  float64 `json:"price"`
+	Type   string  `json:"type"`
 }
 
 func (so SplittedOther) HasFormula() bool {
@@ -31,20 +31,21 @@ func (so SplittedOther) FormattedPrice() string {
 	return formatCurrency(so.Price)
 }
 
-func (so SplittedOther) GetFormula(multiplier int) string {
-	return fmt.Sprintf("%d%% * %s", so.Amount, formatCurrency(multiplier))
+func (so SplittedOther) GetFormula(multiplier float64) string {
+	multiplierAmount := multiplier - so.Price
+	return fmt.Sprintf("%d%% * %s", int64(so.Amount), formatCurrency(multiplierAmount))
 }
 
 type SplittedItem struct {
-	Name  string `json:"name"`
-	ID    string `json:"id"`
-	Price int    `json:"price"`
-	Equal bool   `json:"equal"`
-	Qty   int    `json:"qty"`
+	Name  string  `json:"name"`
+	ID    string  `json:"id"`
+	Price float64 `json:"price"`
+	Equal bool    `json:"equal"`
+	Qty   float64 `json:"qty"`
 }
 
 func (si SplittedItem) FormattedQty() string {
-	return fmt.Sprintf("x%d", si.Qty)
+	return fmt.Sprintf("x%d", int64(si.Qty))
 }
 
 func (si SplittedItem) FormattedPrice() string {
@@ -52,7 +53,7 @@ func (si SplittedItem) FormattedPrice() string {
 }
 
 type SplittedFriend struct {
-	Total       int             `json:"total"`
+	Total       float64         `json:"total"`
 	ID          string          `json:"id"`
 	Name        string          `json:"name"`
 	FriendID    string          `json:"friendId"`
@@ -89,7 +90,8 @@ type Splitted struct {
 	BankAccount string           `json:"bankAccount"`
 	BankNumber  string           `json:"bankNumber"`
 	CreatedAt   time.Time        `json:"createdAt"`
-	GrandTotal  int              `json:"grandTotal"`
+	GrandTotal  float64          `json:"grandTotal"`
+	Subtotal    float64          `json:"subTotal"`
 }
 
 func (s Splitted) TotalFriends() int {
@@ -126,13 +128,13 @@ func (s SplitEntity) TableName() string {
 	return "splits"
 }
 
-func formatCurrency(amount int) string {
+func formatCurrency(amount float64) string {
 	return fmt.Sprintf("IDR %s", formatNumber(amount))
 }
 
 // Helper function to format number with dot as thousand separator
-func formatNumber(n int) string {
-	in := fmt.Sprintf("%d", n)
+func formatNumber(n float64) string {
+	in := fmt.Sprintf("%d", int64(n))
 	out := ""
 	for i, c := range in {
 		if i > 0 && (len(in)-i)%3 == 0 {
