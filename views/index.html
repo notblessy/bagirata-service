@@ -51,7 +51,7 @@
               <!-- Friends list will be populated here -->
 
               <!-- below this should loop data.Friends and add class friend with its child, loop with go html tag -->
-              {{ range .data.Friends }}
+              {{ range .data.Friends }} {{ $friend := . }}
               <div class="friend" id="{{.Name}}">
                 <div class="friend-info">
                   <div
@@ -84,7 +84,16 @@
                     <div class="sub-payment">
                       <div class="p text-xs gray">{{ .Name }}</div>
                       <div class="sub-price">
-                        <div class="p text-xs gray">{{ .FormattedAmount }}</div>
+                        {{if .HasFormula}} {{if .IsTax}}
+                        <div class="p text-xs gray">
+                          {{ .GetFormula $friend.Total }}
+                        </div>
+                        {{ end }} {{if .IsDiscount}}
+                        <div class="p text-xs gray">
+                          {{ .GetFormula $.data.GrandTotal }}
+                        </div>
+                        {{ end }} {{ end }}
+                        <div class="p text-xs gray">{{ .FormattedPrice }}</div>
                       </div>
                     </div>
                     {{ end }}

@@ -11,11 +11,28 @@ type SplittedOther struct {
 	Name   string `json:"name"`
 	ID     string `json:"id"`
 	Amount int    `json:"amount"`
+	Price  int    `json:"price"`
 	Type   string `json:"type"`
 }
 
-func (so SplittedOther) FormattedAmount() string {
-	return formatCurrency(so.Amount)
+func (so SplittedOther) HasFormula() bool {
+	return so.Type == "tax" || so.Type == "discount"
+}
+
+func (so SplittedOther) IsTax() bool {
+	return so.Type == "tax"
+}
+
+func (so SplittedOther) IsDiscount() bool {
+	return so.Type == "discount"
+}
+
+func (so SplittedOther) FormattedPrice() string {
+	return formatCurrency(so.Price)
+}
+
+func (so SplittedOther) GetFormula(multiplier int) string {
+	return fmt.Sprintf("%d%% * %s", so.Amount, formatCurrency(multiplier))
 }
 
 type SplittedItem struct {
