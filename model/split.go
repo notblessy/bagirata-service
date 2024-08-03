@@ -8,11 +8,12 @@ import (
 )
 
 type SplittedOther struct {
-	Name   string  `json:"name"`
-	ID     string  `json:"id"`
-	Amount float64 `json:"amount"`
-	Price  float64 `json:"price"`
-	Type   string  `json:"type"`
+	Name          string  `json:"name"`
+	ID            string  `json:"id"`
+	Amount        float64 `json:"amount"`
+	Price         float64 `json:"price"`
+	Type          string  `json:"type"`
+	UsePercentage bool    `json:"usePercentage"`
 }
 
 func (so SplittedOther) HasFormula() bool {
@@ -24,11 +25,11 @@ func (so SplittedOther) IsTax() bool {
 }
 
 func (so SplittedOther) IsDiscount() bool {
-	return so.Type == "discount"
+	return so.Type == "deduction" && so.UsePercentage
 }
 
 func (so SplittedOther) FormattedPrice() string {
-	if so.Type == "deduction" || so.Type == "discount" {
+	if so.Type == "deduction" {
 		return fmt.Sprintf("-%s", formatCurrency(so.Price))
 	}
 
@@ -104,6 +105,10 @@ func (s Splitted) TotalFriends() int {
 
 func (s Splitted) FormattedCreatedAt() string {
 	return s.CreatedAt.Format("02 January 2006")
+}
+
+func (s Splitted) EmptyBank() bool {
+	return s.BankName == "" && s.BankAccount == "" && s.BankNumber == ""
 }
 
 // Should have method that returns grand total to "IDR 100.000"

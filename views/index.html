@@ -27,6 +27,7 @@
             </div>
           </div>
           <div class="list">
+            {{if not .data.EmptyBank }}
             <div class="transfer-info-section" style="padding: 0 20px">
               <p class="section-title">Transfer Information</p>
               <button class="transfer-info" id="copyButton">
@@ -44,6 +45,7 @@
                 </div>
               </button>
             </div>
+            {{ end }}
             <div class="split-section">
               <p class="section-title" style="padding: 0 20px">
                 Bagirata Split
@@ -84,7 +86,7 @@
                     <div class="sub-payment">
                       <div class="p text-xs gray">{{ .Name }}</div>
                       <div class="sub-price">
-                        {{if .HasFormula}}
+                        {{if .IsTax}}
                         <div class="p text-xs gray">
                           {{ .GetFormula $friend.Subtotal }}
                         </div>
