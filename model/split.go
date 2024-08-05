@@ -37,7 +37,7 @@ func (so SplittedOther) FormattedPrice() string {
 }
 
 func (so SplittedOther) GetFormula(multiplier float64) string {
-	return fmt.Sprintf("%d%% * %s", int64(so.Amount), formatCurrency(multiplier))
+	return fmt.Sprintf("%d%% x %s", int64(so.Amount), formatNumber(multiplier))
 }
 
 type SplittedItem struct {
@@ -49,11 +49,19 @@ type SplittedItem struct {
 }
 
 func (si SplittedItem) FormattedQty() string {
-	return fmt.Sprintf("x%d", int64(si.Qty))
+	if si.Qty > 1 {
+		return fmt.Sprintf("%d x %s", int64(si.Qty), formatNumber(si.Price))
+	}
+
+	return fmt.Sprintf("%d x", int64(si.Qty))
 }
 
 func (si SplittedItem) FormattedPrice() string {
-	return formatCurrency(si.Price)
+	return formatCurrency(si.Price * si.Qty)
+}
+
+func (si SplittedItem) FormattedNumber() string {
+	return formatNumber(si.Qty)
 }
 
 type SplittedFriend struct {
@@ -71,6 +79,10 @@ type SplittedFriend struct {
 
 func (sf SplittedFriend) FormattedTotal() string {
 	return formatCurrency(sf.Total)
+}
+
+func (sf SplittedFriend) FormattedSubTotal() string {
+	return formatCurrency(sf.Subtotal)
 }
 
 func (sf SplittedFriend) InitialName() string {

@@ -67,13 +67,21 @@
                       <span class="p text-lg">{{ .Name }}</span>
                       <span class="p text-lg">{{ .FormattedTotal }}</span>
                     </div>
+                    <div class="friend-header">
+                      <span class="p text-xs gray" style="font-weight: 600"
+                        >Subtotal</span
+                      >
+                      <span class="p text-xs gray" style="font-weight: 600"
+                        >{{ .FormattedSubTotal }}</span
+                      >
+                    </div>
                     {{ range .Items }}
                     <div class="sub-payment">
-                      <div class="p text-xs gray">{{ .Name }}</div>
+                      <div class="p text-xs gray">- {{ .Name }}</div>
                       <div class="sub-price">
                         {{if .Equal}}
                         <div class="p text-xs gray">
-                          x1/{{ $.data.TotalFriends }}
+                          1/{{ $.data.TotalFriends }} x {{ .FormattedNumber }}
                         </div>
                         {{else}}
                         <div class="p text-xs gray">{{ .FormattedQty }}</div>
@@ -84,7 +92,7 @@
                     </div>
                     {{ end }} {{ range .Others}}
                     <div class="sub-payment">
-                      <div class="p text-xs gray">{{ .Name }}</div>
+                      <div class="p text-xs gray">- {{ .Name }}</div>
                       <div class="sub-price">
                         {{if .IsTax}}
                         <div class="p text-xs gray">
