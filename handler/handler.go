@@ -150,18 +150,18 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 	// find by slug to supabase
 	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
 	if err != nil {
-		return c.Render(http.StatusInternalServerError, "404.html", nil)
+		return c.Render(http.StatusNotFound, "404.html", nil)
 	}
 
 	err = json.Unmarshal(data, &splitted)
 	if err != nil {
-		return c.Render(http.StatusInternalServerError, "404.html", nil)
+		return c.Render(http.StatusNotFound, "404.html", nil)
 	}
 
 	var splittedData model.Splitted
 	err = json.Unmarshal(splitted.Data, &splittedData)
 	if err != nil {
-		return c.Render(http.StatusInternalServerError, "404.html", nil)
+		return c.Render(http.StatusNotFound, "404.html", nil)
 	}
 
 	return c.Render(http.StatusOK, "index.html", map[string]interface{}{

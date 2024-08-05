@@ -56,6 +56,11 @@ func main() {
 	e.RouteNotFound("*", notFound)
 
 	e.GET("/", handler.ViewLandingPage)
+
+	e.GET("/app-ads.txt", func(c echo.Context) error {
+		return c.File("ads/app-ads.txt")
+	})
+
 	e.GET("/:slug", handler.ViewSplitBySlug)
 	e.GET("/support/privacy", handler.ViewPrivacyPolicy)
 
