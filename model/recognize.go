@@ -7,16 +7,16 @@ type RecognizeRequest struct {
 }
 
 type Item struct {
-	Name  string `json:"name"`
-	Qty   int    `json:"qty"`
-	Price int    `json:"price"`
+	Name  string  `json:"name"`
+	Qty   int     `json:"qty"`
+	Price float64 `json:"price"`
 }
 
 type OtherPayment struct {
-	Name          string `json:"name"`
-	Type          string `json:"type"`
-	Amount        int    `json:"amount"`
-	UsePercentage bool   `json:"usePercentage"`
+	Name          string  `json:"name"`
+	Type          string  `json:"type"`
+	Amount        float64 `json:"amount"`
+	UsePercentage bool    `json:"usePercentage"`
 }
 
 type Recognized struct {

@@ -13,6 +13,7 @@ import (
 	"github.com/notblessy/db"
 	"github.com/notblessy/handler"
 	"github.com/sashabaranov/go-openai"
+	"github.com/sirupsen/logrus"
 )
 
 type Template struct {
@@ -21,6 +22,10 @@ type Template struct {
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+func init() {
+	setupLogger()
 }
 
 func main() {
@@ -74,4 +79,22 @@ func main() {
 
 func notFound(c echo.Context) error {
 	return c.Render(http.StatusNotFound, "404.html", nil)
+}
+
+func setupLogger() {
+	formatter := logrus.TextFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+		FullTimestamp:   true,
+		ForceColors:     false,
+	}
+
+	logrus.SetFormatter(&formatter)
+	logrus.SetOutput(os.Stdout)
+
+	logLevel, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		logLevel = logrus.DebugLevel
+	}
+
+	logrus.SetLevel(logLevel)
 }
