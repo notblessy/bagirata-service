@@ -13,9 +13,10 @@ type Item struct {
 }
 
 type OtherPayment struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Amount int    `json:"amount"`
+	Name          string `json:"name"`
+	Type          string `json:"type"`
+	Amount        int    `json:"amount"`
+	UsePercentage bool   `json:"usePercentage"`
 }
 
 type Recognized struct {

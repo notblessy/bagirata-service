@@ -15,6 +15,7 @@ var systemPrompt = `given receipt array, parse to this schema:
             "name": "Discount/Tax/etc",
             "type": "deduction/addition/tax/discount",
             "amount": int
+            "usePercentage": bool // true if percentage, false if exact value
         }
     ]
 }
