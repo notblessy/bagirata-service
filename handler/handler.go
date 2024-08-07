@@ -37,7 +37,7 @@ func (h *Handler) Recognize(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to bind request: %w", err).Error,
+			"message": fmt.Errorf("failed to bind request: %w", err).Error(),
 			"data":    nil,
 		})
 	}
@@ -63,7 +63,7 @@ func (h *Handler) Recognize(c echo.Context) error {
 
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to create chat completion: %w", err).Error,
+			"message": fmt.Errorf("failed to create chat completion: %w", err).Error(),
 			"data":    nil,
 		})
 	}
@@ -78,7 +78,7 @@ func (h *Handler) Recognize(c echo.Context) error {
 
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to unmarshal recognized: %w", err).Error,
+			"message": fmt.Errorf("failed to unmarshal recognized: %w", err).Error(),
 			"data":    nil,
 		})
 	}
@@ -102,7 +102,7 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"success": false,
-			"message": fmt.Errorf("failed to bind request: %w", err).Error,
+			"message": fmt.Errorf("failed to bind request: %w", err).Error(),
 			"data":    nil,
 		})
 	}
