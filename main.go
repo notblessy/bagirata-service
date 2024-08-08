@@ -46,6 +46,8 @@ func main() {
 	e := echo.New()
 
 	e.Static("/static", "public")
+	e.Static("", "ads")
+
 	e.Renderer = t
 
 	e.Use(middleware.Logger())
@@ -61,15 +63,7 @@ func main() {
 
 	e.GET("/", handler.ViewLandingPage)
 
-	e.GET("/app-ads.txt", func(c echo.Context) error {
-		return c.File("ads/app-ads.txt")
-	})
-
-	e.GET("/ads.txt", func(c echo.Context) error {
-		return c.File("ads/app-ads.txt")
-	})
-
-	e.GET("/:slug", handler.ViewSplitBySlug)
+	e.GET("/view/:slug", handler.ViewSplitBySlug)
 	e.GET("/support/privacy", handler.ViewPrivacyPolicy)
 
 	e.POST("/v1/recognize", handler.Recognize)
