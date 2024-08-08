@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"text/template"
@@ -31,7 +30,7 @@ func init() {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("[WARNING] Error loading .env file")
+		logrus.Warn("Error loading .env file")
 	}
 
 	supabase := db.NewSupabase()
@@ -63,6 +62,10 @@ func main() {
 	e.GET("/", handler.ViewLandingPage)
 
 	e.GET("/app-ads.txt", func(c echo.Context) error {
+		return c.File("ads/app-ads.txt")
+	})
+
+	e.GET("/ads.txt", func(c echo.Context) error {
 		return c.File("ads/app-ads.txt")
 	})
 
