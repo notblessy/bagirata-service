@@ -49,8 +49,12 @@ type SplittedItem struct {
 }
 
 func (si SplittedItem) FormattedQty() string {
+	if si.Equal {
+		return fmt.Sprintf("%d x %s", int64(si.Price), formatNumber(si.Price/si.Qty))
+	}
+
 	if si.Qty > 1 {
-		return fmt.Sprintf("%d x %s", int64(si.Qty), formatNumber(si.Price))
+		return fmt.Sprintf("%d x %s", int64(si.Qty), formatNumber(si.Price*si.Qty))
 	}
 
 	return fmt.Sprintf("%d x", int64(si.Qty))
