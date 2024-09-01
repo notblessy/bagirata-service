@@ -10,8 +10,8 @@ type BagirataTime struct {
 }
 
 const (
-	layout24Hour = time.RFC3339
-	layout12Hour = "2006-01-02T3:04:05PMZ"
+	layout24Hour = "2006-01-02T15:04:05Z"
+	layout12Hour = "2006-01-02T3:04:05 PMZ"
 )
 
 func (ct *BagirataTime) UnmarshalJSON(b []byte) error {
