@@ -75,7 +75,7 @@ type SplittedFriend struct {
 	Name        string          `json:"name"`
 	FriendID    string          `json:"friendId"`
 	Me          bool            `json:"me"`
-	CreatedAt   time.Time       `json:"createdAt"`
+	CreatedAt   BagirataTime    `json:"createdAt"`
 	AccentColor string          `json:"accentColor"`
 	Items       []SplittedItem  `json:"items"`
 	Others      []SplittedOther `json:"others"`
