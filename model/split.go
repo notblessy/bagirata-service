@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type SplittedOther struct {
@@ -110,7 +112,7 @@ type Splitted struct {
 	BankName    string           `json:"bankName"`
 	BankAccount string           `json:"bankAccount"`
 	BankNumber  string           `json:"bankNumber"`
-	CreatedAt   time.Time        `json:"createdAt"`
+	CreatedAt   string           `json:"createdAt"`
 	GrandTotal  float64          `json:"grandTotal"`
 	Subtotal    float64          `json:"subTotal"`
 }
@@ -120,7 +122,14 @@ func (s Splitted) TotalFriends() int {
 }
 
 func (s Splitted) FormattedCreatedAt() string {
-	return s.CreatedAt.Format("02 January 2006")
+	// string to time
+	timeDate, err := time.Parse("2006-01-02T15:04:05Z", s.CreatedAt)
+	if err != nil {
+		logrus.Error(fmt.Errorf("failed to parse time: %w", err))
+		return ""
+	}
+
+	return timeDate.Format("02 January 2006")
 }
 
 func (s Splitted) EmptyBank() bool {
