@@ -9,113 +9,121 @@
   </head>
   <body>
     <div class="container">
-      <div class="navigation-stack">
-        <div class="image-container">
-          <img src="/static/logo.png" alt="Bagirata Logo" />
-          <p>Bagirata</p>
-        </div>
-        <div class="content">
-          <div class="header">
-            <div class="header-text">
-              <h1 id="splitName">{{ .data.Name }}</h1>
-              <p id="splitDate" class="gray-text">
-                {{ .data.FormattedCreatedAt }}
-              </p>
-            </div>
-            <div class="header-amount price-text" id="splitAmount">
-              {{ .data.FormattedGrandTotal }}
-            </div>
+      <div class="mobile">
+        <div class="navigation-stack" id="hero">
+          <div class="image-container">
+            <img src="/static/logo.png" alt="Bagirata Logo" />
+            <p>Bagirata</p>
           </div>
-          <div class="list">
-            {{if not .data.EmptyBank }}
-            <div class="transfer-info-section" style="padding: 0 20px">
-              <p class="section-title">Transfer Information</p>
-              <button class="transfer-info" id="copyButton">
-                <div class="bank-details">
-                  <p class="p bold text-sm" id="bankName">
-                    {{ .data.BankName }}
-                  </p>
-                  <div class="bank-number">
-                    <p id="bankNumber" class="p text-sm">
-                      {{ .data.BankNumber }}
-                    </p>
-                    <span class="icon">📋</span>
-                  </div>
-                  <p class="p gray" id="accountName">{{ .data.BankAccount }}</p>
-                </div>
-              </button>
+          <div class="content">
+            <div class="header">
+              <div class="header-text">
+                <h1 id="splitName">{{ .data.Name }}</h1>
+                <p id="splitDate" class="gray-text">
+                  {{ .data.FormattedCreatedAt }}
+                </p>
+              </div>
+              <div class="header-amount price-text" id="splitAmount">
+                {{ .data.FormattedGrandTotal }}
+              </div>
             </div>
-            {{ end }}
-            <div class="split-section">
-              <p class="section-title" style="padding: 0 20px">
-                Bagirata Split
-              </p>
-              <!-- Friends list will be populated here -->
-
-              <!-- below this should loop data.Friends and add class friend with its child, loop with go html tag -->
-              {{ range .data.Friends }} {{ $friend := . }}
-              <div class="friend" id="{{.Name}}">
-                <div class="friend-info">
-                  <div
-                    class="avatar"
-                    style="background-color: {{ .AccentColor }};"
-                  >
-                    {{ .InitialName }}
+            <div class="list">
+              {{if not .data.EmptyBank }}
+              <div class="transfer-info-section" style="padding: 0 20px">
+                <p class="section-title">Transfer Information</p>
+                <button class="transfer-info" id="copyButton">
+                  <div class="bank-details">
+                    <p class="p bold text-sm" id="bankName">
+                      {{ .data.BankName }}
+                    </p>
+                    <div class="bank-number">
+                      <p id="bankNumber" class="p text-sm">
+                        {{ .data.BankNumber }}
+                      </p>
+                      <span class="icon">📋</span>
+                    </div>
+                    <p class="p gray" id="accountName">
+                      {{ .data.BankAccount }}
+                    </p>
                   </div>
-                  <div class="friend-details">
-                    <div class="friend-header">
-                      <span class="p text-lg">{{ .Name }}</span>
-                      <span class="p text-lg">{{ .FormattedTotal }}</span>
-                    </div>
-                    <div class="friend-header">
-                      <span class="p text-xs gray" style="font-weight: 600"
-                        >Subtotal</span
-                      >
-                      <span class="p text-xs gray" style="font-weight: 600"
-                        >{{ .FormattedSubTotal }}</span
-                      >
-                    </div>
-                    {{ range .Items }}
-                    <div class="sub-payment">
-                      <div class="p text-xs gray">- {{ .Name }}</div>
-                      <div class="sub-price">
-                        {{if .Equal}}
-                        <div class="p text-xs gray">
-                          1/{{ $.data.TotalFriends }} x {{ .FormattedNumber }}
-                        </div>
-                        {{else}}
-                        <div class="p text-xs gray">{{ .FormattedQty }}</div>
-                        {{end}}
-
-                        <div class="p text-xs gray">{{ .FormattedPrice }}</div>
-                      </div>
-                    </div>
-                    {{ end }} {{ range .Others}}
-                    <div class="sub-payment">
-                      <div class="p text-xs gray">- {{ .Name }}</div>
-                      <div class="sub-price">
-                        {{if .IsTax}}
-                        <div class="p text-xs gray">
-                          {{ .GetFormula $friend.Subtotal }}
-                        </div>
-                        {{ end }}
-                        <div class="p text-xs gray">{{ .FormattedPrice }}</div>
-                      </div>
-                    </div>
-                    {{ end }}
-                  </div>
-                </div>
+                </button>
               </div>
               {{ end }}
+              <div class="split-section">
+                <p class="section-title" style="padding: 0 20px">
+                  Bagirata Split
+                </p>
+                <!-- Friends list will be populated here -->
+
+                <!-- below this should loop data.Friends and add class friend with its child, loop with go html tag -->
+                {{ range .data.Friends }} {{ $friend := . }}
+                <div class="friend" id="{{.Name}}">
+                  <div class="friend-info">
+                    <div
+                      class="avatar"
+                      style="background-color: {{ .AccentColor }};"
+                    >
+                      {{ .InitialName }}
+                    </div>
+                    <div class="friend-details">
+                      <div class="friend-header">
+                        <span class="p text-lg">{{ .Name }}</span>
+                        <span class="p text-lg">{{ .FormattedTotal }}</span>
+                      </div>
+                      <div class="friend-header">
+                        <span class="p text-xs gray" style="font-weight: 600"
+                          >Subtotal</span
+                        >
+                        <span class="p text-xs gray" style="font-weight: 600"
+                          >{{ .FormattedSubTotal }}</span
+                        >
+                      </div>
+                      {{ range .Items }}
+                      <div class="sub-payment">
+                        <div class="p text-xs gray">- {{ .Name }}</div>
+                        <div class="sub-price">
+                          {{if .Equal}}
+                          <div class="p text-xs gray">
+                            1/{{ $.data.TotalFriends }} x {{ .FormattedNumber }}
+                          </div>
+                          {{else}}
+                          <div class="p text-xs gray">{{ .FormattedQty }}</div>
+                          {{end}}
+
+                          <div class="p text-xs gray">
+                            {{ .FormattedPrice }}
+                          </div>
+                        </div>
+                      </div>
+                      {{ end }} {{ range .Others}}
+                      <div class="sub-payment">
+                        <div class="p text-xs gray">- {{ .Name }}</div>
+                        <div class="sub-price">
+                          {{if .IsTax}}
+                          <div class="p text-xs gray">
+                            {{ .GetFormula $friend.Subtotal }}
+                          </div>
+                          {{ end }}
+                          <div class="p text-xs gray">
+                            {{ .FormattedPrice }}
+                          </div>
+                        </div>
+                      </div>
+                      {{ end }}
+                    </div>
+                  </div>
+                </div>
+                {{ end }}
+              </div>
             </div>
           </div>
-        </div>
-        <div id="alert" class="alert hidden">
-          <div class="alert-message">
-            <p style="padding-bottom: 5px" class="p pgap text-lg">Success</p>
-            <p class="p pgap text-sm gray">Number copied to clipboard!</p>
+          <div id="alert" class="alert hidden">
+            <div class="alert-message">
+              <p style="padding-bottom: 5px" class="p pgap text-lg">Success</p>
+              <p class="p pgap text-sm gray">Number copied to clipboard!</p>
+            </div>
+            <button id="alertDismiss" class="alertButton">Dismiss</button>
           </div>
-          <button id="alertDismiss" class="alertButton">Dismiss</button>
         </div>
       </div>
     </div>

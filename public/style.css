@@ -2,20 +2,49 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background-color: #e5f7ff;
+  height: 100vh;
 }
 
 .container {
   width: 100%;
   max-width: 480px;
-  background-color: white;
   margin: 0 auto;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.mobile {
+  height: 90%;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 1025px) {
+  .mobile {
+    height: 100%;
+  }
+}
+
+#hero {
+  background: url(./assets/img/bagirata-bg.png) center bottom no-repeat;
+  background-size: 100%;
+  position: relative;
 }
 
 .navigation-stack {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   max-width: 100vw;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
 }
 
 .image-container {
@@ -23,7 +52,14 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  padding: 40px 0 20px;
+  width: 100%;
+  height: auto;
+  background: rgba(255, 255, 255, 0.3); 
+  backdrop-filter: blur(40px);
+  position: absolute;
+  border-radius: 20px 20px 0 0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .image-container img {
@@ -42,7 +78,11 @@ body {
 }
 
 .content {
+  padding-top: 170.56px;
   flex: 1;
+  overflow: hidden;
+  overflow-y: scroll;
+  border-radius: 20px;
 }
 
 .header {
@@ -101,8 +141,10 @@ body {
 }
 
 .friend {
-  padding: 20px 0;
+  padding: 20px 10px;
   border-bottom: 1px solid #e0e0e0;
+  background: rgba(255, 255, 255, 0.3); /* Transparent white */
+  backdrop-filter: blur(10px); /* Blurring the background */
 }
 
 .friend-info {
