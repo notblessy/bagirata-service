@@ -60,6 +60,8 @@ body {
   position: absolute;
   border-radius: 20px 20px 0 0;
   border-bottom: 1px solid #e0e0e0;
+
+  -webkit-backdrop-filter: blur(40px);
 }
 
 .image-container img {
@@ -145,6 +147,8 @@ body {
   border-bottom: 1px solid #e0e0e0;
   background: rgba(255, 255, 255, 0.3); /* Transparent white */
   backdrop-filter: blur(10px); /* Blurring the background */
+
+  -webkit-backdrop-filter: blur(40px);
 }
 
 .friend-info {
