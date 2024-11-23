@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/notblessy/db"
 	"github.com/notblessy/handler"
+	"github.com/notblessy/model"
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
 )
@@ -33,11 +34,13 @@ func main() {
 		logrus.Warn("Error loading .env file")
 	}
 
-	supabase := db.NewSupabase()
+	postgres := db.NewPostgres()
+
+	postgres.AutoMigrate(&model.SplitEntity{})
 
 	openAi := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
-	handler := handler.NewHandler(supabase, openAi)
+	handler := handler.NewHandler(postgres, openAi)
 
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),

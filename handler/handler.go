@@ -12,17 +12,17 @@ import (
 	"github.com/notblessy/utils"
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
-	"github.com/supabase-community/supabase-go"
+	"gorm.io/gorm"
 )
 
 type Handler struct {
-	sb     *supabase.Client
+	db     *gorm.DB
 	openAi *openai.Client
 }
 
-func NewHandler(sb *supabase.Client, openAi *openai.Client) *Handler {
+func NewHandler(db *gorm.DB, openAi *openai.Client) *Handler {
 	return &Handler{
-		sb:     sb,
+		db:     db,
 		openAi: openAi,
 	}
 }
@@ -109,7 +109,7 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 
 	entity := splitted.ToData()
 
-	_, _, err := h.sb.From("splits").Upsert(entity, "", "", "").Execute()
+	err := h.db.Save(&entity).Error
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to upsert split: %w", err))
 
@@ -137,23 +137,11 @@ func (h *Handler) FindSplitBySlug(c echo.Context) error {
 
 	var splitted model.SplitEntity
 
-	// find by slug to supabase
-	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
+	err := h.db.Where("slug = ?", slug).First(&splitted).Error
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to find split by slug: %w", err))
 
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"success": false,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
-
-	err = json.Unmarshal(data, &splitted)
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to unmarshal split: %w", err))
-
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"success": false,
 			"message": err.Error(),
 			"data":    nil,
@@ -177,18 +165,15 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 
 	var splitted model.SplitEntity
 
-	// find by slug to supabase
-	data, _, err := h.sb.From("splits").Select("*", "exact", false).Eq("slug", slug).Single().Execute()
+	err := h.db.Where("slug = ?", slug).First(&splitted).Error
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to find split by slug: %w", err))
 
-		return c.Render(http.StatusNotFound, "404.html", nil)
-	}
-
-	err = json.Unmarshal(data, &splitted)
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to unmarshal split: %w", err))
-		return c.Render(http.StatusNotFound, "404.html", nil)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
 	}
 
 	var splittedData model.Splitted
