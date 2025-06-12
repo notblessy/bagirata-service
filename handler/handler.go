@@ -186,7 +186,9 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 }
 
 func (h *Handler) ViewPrivacyPolicy(c echo.Context) error {
-	return c.Render(http.StatusOK, "privacy.html", nil)
+
+	return c.Redirect(http.StatusOK, "https://bagirata.notblessy.com/privacy")
+	// return c.Render(http.StatusOK, "privacy.html", nil)
 }
 
 func (h *Handler) ViewLandingPage(c echo.Context) error {
