@@ -158,7 +158,7 @@ func (h *Handler) FindSplitBySlug(c echo.Context) error {
 func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 	slug := c.Param("slug")
 
-	return c.Redirect(http.StatusOK, fmt.Sprintf("https://bagirata.notblessy.com/view/%s", slug))
+	return c.Redirect(http.StatusFound, fmt.Sprintf("https://bagirata.notblessy.com/view/%s", slug))
 
 	// var splitted model.SplitEntity
 
@@ -187,7 +187,7 @@ func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 
 func (h *Handler) ViewPrivacyPolicy(c echo.Context) error {
 
-	return c.Redirect(http.StatusOK, "https://bagirata.notblessy.com/privacy")
+	return c.Redirect(http.StatusFound, "https://bagirata.notblessy.com/privacy")
 	// return c.Render(http.StatusOK, "privacy.html", nil)
 }
 
