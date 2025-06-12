@@ -62,6 +62,14 @@ func main() {
 		},
 	}))
 
+	// implement cors
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:  []string{"*"},
+		AllowMethods:  []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		ExposeHeaders: []string{echo.HeaderContentType, echo.HeaderContentLength},
+	}))
+
 	e.RouteNotFound("*", notFound)
 
 	e.GET("/", handler.ViewLandingPage)

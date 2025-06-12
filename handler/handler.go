@@ -158,34 +158,31 @@ func (h *Handler) FindSplitBySlug(c echo.Context) error {
 func (h *Handler) ViewSplitBySlug(c echo.Context) error {
 	slug := c.Param("slug")
 
-	logger := logrus.WithFields(logrus.Fields{
-		"ctx":  utils.Dump(c.Request().Context()),
-		"slug": slug,
-	})
+	return c.Redirect(http.StatusOK, fmt.Sprintf("https://bagirata.notblessy.com/view/%s", slug))
 
-	var splitted model.SplitEntity
+	// var splitted model.SplitEntity
 
-	err := h.db.Where("slug = ?", slug).First(&splitted).Error
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to find split by slug: %w", err))
+	// err := h.db.Where("slug = ?", slug).First(&splitted).Error
+	// if err != nil {
+	// 	logger.Error(fmt.Errorf("failed to find split by slug: %w", err))
 
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"success": false,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
+	// 	return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+	// 		"success": false,
+	// 		"message": err.Error(),
+	// 		"data":    nil,
+	// 	})
+	// }
 
-	var splittedData model.Splitted
-	err = json.Unmarshal(splitted.Data, &splittedData)
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to unmarshal split data: %w", err))
-		return c.Render(http.StatusNotFound, "404.html", nil)
-	}
+	// var splittedData model.Splitted
+	// err = json.Unmarshal(splitted.Data, &splittedData)
+	// if err != nil {
+	// 	logger.Error(fmt.Errorf("failed to unmarshal split data: %w", err))
+	// 	return c.Render(http.StatusNotFound, "404.html", nil)
+	// }
 
-	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"data": splittedData,
-	})
+	// return c.Render(http.StatusOK, "index.html", map[string]interface{}{
+	// 	"data": splittedData,
+	// })
 }
 
 func (h *Handler) ViewPrivacyPolicy(c echo.Context) error {
