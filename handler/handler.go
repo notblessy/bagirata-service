@@ -192,5 +192,6 @@ func (h *Handler) ViewPrivacyPolicy(c echo.Context) error {
 }
 
 func (h *Handler) ViewLandingPage(c echo.Context) error {
-	return c.Render(http.StatusOK, "landing.html", nil)
+	return c.Redirect(http.StatusMovedPermanently, "https://bagirata.notblessy.com")
+	// return c.Render(http.StatusOK, "landing.html", nil)
 }
