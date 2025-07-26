@@ -69,7 +69,6 @@ func (h *Handler) Recognize(c echo.Context) error {
 	}
 
 	var recognized model.Recognized
-
 	recognized.CreatedAt = time.Now()
 
 	err = json.Unmarshal([]byte(resp.Choices[0].Message.Content), &recognized)
@@ -84,6 +83,14 @@ func (h *Handler) Recognize(c echo.Context) error {
 	}
 
 	recognized.ID = uuid.New().String()
+
+	// Save to datasets table
+	dataset := model.Dataset{
+		Model: request.Model,
+	}
+	if err := h.db.Create(&dataset).Error; err != nil {
+		logger.Error(fmt.Errorf("failed to save dataset: %w", err))
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"success": true,
