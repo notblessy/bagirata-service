@@ -43,11 +43,13 @@ func (so SplittedOther) GetFormula(multiplier float64) string {
 }
 
 type SplittedItem struct {
-	Name  string  `json:"name"`
-	ID    string  `json:"id"`
-	Price float64 `json:"price"`
-	Equal bool    `json:"equal"`
-	Qty   float64 `json:"qty"`
+	Name                 string  `json:"name"`
+	ID                   string  `json:"id"`
+	Price                float64 `json:"price"`
+	Equal                bool    `json:"equal"`
+	Qty                  float64 `json:"qty"`
+	Discount             float64 `json:"discount,omitempty"`
+	DiscountIsPercentage bool    `json:"discountIsPercentage,omitempty"`
 }
 
 func (si SplittedItem) FormattedQty() string {
@@ -62,8 +64,44 @@ func (si SplittedItem) FormattedQty() string {
 	return fmt.Sprintf("%d x", int64(si.Qty))
 }
 
+func (si SplittedItem) BaseSubTotal() float64 {
+	return si.Price * si.Qty
+}
+
+func (si SplittedItem) DiscountAmount() float64 {
+	if si.Discount > 0 {
+		baseTotal := si.BaseSubTotal()
+		if si.DiscountIsPercentage {
+			return (si.Discount / 100) * baseTotal
+		} else {
+			return si.Discount
+		}
+	}
+	return 0
+}
+
+func (si SplittedItem) SubTotal() float64 {
+	baseTotal := si.BaseSubTotal()
+	return baseTotal - si.DiscountAmount()
+}
+
+func (si SplittedItem) HasDiscount() bool {
+	return si.Discount > 0
+}
+
 func (si SplittedItem) FormattedPrice() string {
-	return formatCurrency(si.Price * si.Qty)
+	if si.HasDiscount() {
+		return formatCurrency(si.SubTotal())
+	}
+	return formatCurrency(si.BaseSubTotal())
+}
+
+func (si SplittedItem) FormattedBasePrice() string {
+	return formatCurrency(si.BaseSubTotal())
+}
+
+func (si SplittedItem) FormattedDiscountAmount() string {
+	return formatCurrency(si.DiscountAmount())
 }
 
 func (si SplittedItem) FormattedNumber() string {
@@ -89,6 +127,51 @@ func (sf SplittedFriend) FormattedTotal() string {
 
 func (sf SplittedFriend) FormattedSubTotal() string {
 	return formatCurrency(sf.Subtotal)
+}
+
+func (sf SplittedFriend) TotalItemDiscounts() float64 {
+	total := 0.0
+	for _, item := range sf.Items {
+		total += item.DiscountAmount()
+	}
+	return total
+}
+
+func (sf SplittedFriend) FormattedTotalItemDiscounts() string {
+	return formatCurrency(sf.TotalItemDiscounts())
+}
+
+func (sf SplittedFriend) HasItemDiscounts() bool {
+	for _, item := range sf.Items {
+		if item.HasDiscount() {
+			return true
+		}
+	}
+	return false
+}
+
+func (sf SplittedFriend) OriginalItemsSubtotal() float64 {
+	total := 0.0
+	for _, item := range sf.Items {
+		total += item.BaseSubTotal()
+	}
+	return total
+}
+
+func (sf SplittedFriend) FormattedOriginalItemsSubtotal() string {
+	return formatCurrency(sf.OriginalItemsSubtotal())
+}
+
+func (sf SplittedFriend) DiscountedItemsSubtotal() float64 {
+	total := 0.0
+	for _, item := range sf.Items {
+		total += item.SubTotal()
+	}
+	return total
+}
+
+func (sf SplittedFriend) FormattedDiscountedItemsSubtotal() string {
+	return formatCurrency(sf.DiscountedItemsSubtotal())
 }
 
 func (sf SplittedFriend) InitialName() string {
@@ -119,6 +202,63 @@ type Splitted struct {
 
 func (s Splitted) TotalFriends() int {
 	return len(s.Friends)
+}
+
+func (s Splitted) TotalItemDiscounts() float64 {
+	total := 0.0
+	for _, friend := range s.Friends {
+		total += friend.TotalItemDiscounts()
+	}
+	return total
+}
+
+func (s Splitted) FormattedTotalItemDiscounts() string {
+	return formatCurrency(s.TotalItemDiscounts())
+}
+
+func (s Splitted) HasItemDiscounts() bool {
+	for _, friend := range s.Friends {
+		if friend.HasItemDiscounts() {
+			return true
+		}
+	}
+	return false
+}
+
+func (s Splitted) OriginalSubtotal() float64 {
+	total := 0.0
+	for _, friend := range s.Friends {
+		total += friend.OriginalItemsSubtotal()
+	}
+	return total
+}
+
+func (s Splitted) FormattedOriginalSubtotal() string {
+	return formatCurrency(s.OriginalSubtotal())
+}
+
+func (s Splitted) DiscountedItemsSubtotal() float64 {
+	total := 0.0
+	for _, friend := range s.Friends {
+		total += friend.DiscountedItemsSubtotal()
+	}
+	return total
+}
+
+func (s Splitted) FormattedDiscountedItemsSubtotal() string {
+	return formatCurrency(s.DiscountedItemsSubtotal())
+}
+
+func (s Splitted) TotalDiscountedItems() int {
+	count := 0
+	for _, friend := range s.Friends {
+		for _, item := range friend.Items {
+			if item.HasDiscount() {
+				count++
+			}
+		}
+	}
+	return count
 }
 
 func (s Splitted) FormattedCreatedAt() string {
