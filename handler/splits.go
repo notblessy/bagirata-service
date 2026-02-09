@@ -40,9 +40,13 @@ func (h *Handler) ListSplits(c echo.Context) error {
 	}
 	offset := (page - 1) * size
 
+	query := h.db.Where("user_id = ?", userID)
+	if groupID := c.QueryParam("group_id"); groupID != "" {
+		query = query.Where("group_id = ?", groupID)
+	}
+
 	var entities []model.SplitEntity
-	err := h.db.Where("user_id = ?", userID).
-		Order("created_at DESC").
+	err := query.Order("created_at DESC").
 		Limit(size).
 		Offset(offset).
 		Find(&entities).Error

@@ -37,7 +37,7 @@ func main() {
 
 	postgres := db.NewPostgres()
 
-	postgres.AutoMigrate(&model.User{}, &model.SplitEntity{})
+	postgres.AutoMigrate(&model.User{}, &model.SplitEntity{}, &model.Group{})
 
 	openAi := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
@@ -95,6 +95,11 @@ func main() {
 	e.GET("/v1/splits", h.ListSplits, requireAuth)
 	e.GET("/v1/splits/:slug", h.FindSplitBySlug)
 	e.POST("/v1/splits", h.SaveSplit, optionalAuth)
+
+	e.GET("/v1/groups", h.ListGroups, requireAuth)
+	e.POST("/v1/groups", h.CreateGroup, requireAuth)
+	e.GET("/v1/groups/:id", h.GetGroup, requireAuth)
+	e.GET("/v1/groups/:id/summary", h.GetGroupSummary, requireAuth)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

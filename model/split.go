@@ -198,6 +198,7 @@ type Splitted struct {
 	CreatedAt   string           `json:"createdAt"`
 	GrandTotal  float64          `json:"grandTotal"`
 	Subtotal    float64          `json:"subTotal"`
+	GroupID     *string          `json:"groupId,omitempty"` // optional; assign split to a group
 }
 
 func (s Splitted) TotalFriends() int {
@@ -297,13 +298,14 @@ func (s Splitted) ToData() SplitEntity {
 }
 
 type SplitEntity struct {
-	ID         string          `json:"id" gorm:"primaryKey"`
-	Slug       string          `json:"slug" gorm:"unique"`
-	Data       json.RawMessage `json:"data" gorm:"type:jsonb"`
-	UserID      *string         `json:"userId,omitempty" gorm:"type:uuid;index"` // nil = anonymous split
-	Name        string          `json:"name" gorm:"index"`                      // denormalized for list
-	GrandTotal  float64         `json:"grandTotal"`                              // denormalized for list
-	FriendCount int             `json:"-" gorm:"column:friend_count"`           // denormalized for list
+	ID          string          `json:"id" gorm:"primaryKey"`
+	Slug        string          `json:"slug" gorm:"unique"`
+	Data        json.RawMessage `json:"data" gorm:"type:jsonb"`
+	UserID      *string         `json:"userId,omitempty" gorm:"type:uuid;index"`   // nil = anonymous split
+	GroupID     *string         `json:"groupId,omitempty" gorm:"type:uuid;index"` // optional group (e.g. "Trip to Japan")
+	Name        string          `json:"name" gorm:"index"`                        // denormalized for list
+	GrandTotal  float64         `json:"grandTotal"`                               // denormalized for list
+	FriendCount int             `json:"-" gorm:"column:friend_count"`             // denormalized for list
 	CreatedAt   time.Time       `json:"createdAt" gorm:"autoCreateTime"`
 }
 

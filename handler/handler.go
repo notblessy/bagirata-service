@@ -119,6 +119,12 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 	if userID, ok := c.Get(middleware.UserIDKey).(string); ok && userID != "" {
 		entity.UserID = &userID
 	}
+	if splitted.GroupID != nil && *splitted.GroupID != "" && entity.UserID != nil && *entity.UserID != "" {
+		var g model.Group
+		if err := h.db.Where("id = ? AND user_id = ?", *splitted.GroupID, *entity.UserID).First(&g).Error; err == nil {
+			entity.GroupID = splitted.GroupID
+		}
+	}
 
 	err := h.db.Save(&entity).Error
 	if err != nil {
