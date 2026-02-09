@@ -13,8 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ListSplits returns the authenticated user's splits with pagination.
-// GET /v1/splits?page=1&size=10
+// ListSplits returns the authenticated user's splits with pagination and optional search.
+// GET /v1/splits?page=1&size=10&search=term
 func (h *Handler) ListSplits(c echo.Context) error {
 	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
 
@@ -43,6 +43,9 @@ func (h *Handler) ListSplits(c echo.Context) error {
 	query := h.db.Where("user_id = ?", userID)
 	if groupID := c.QueryParam("group_id"); groupID != "" {
 		query = query.Where("group_id = ?", groupID)
+	}
+	if search := c.QueryParam("search"); search != "" {
+		query = query.Where("name ILIKE ?", "%"+search+"%")
 	}
 
 	var entities []model.SplitEntity

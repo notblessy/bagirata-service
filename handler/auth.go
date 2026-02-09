@@ -190,11 +190,118 @@ func (h *Handler) Me(c echo.Context) error {
 	})
 }
 
+func (h *Handler) UpdateProfile(c echo.Context) error {
+	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
+
+	userID, ok := c.Get(middleware.UserIDKey).(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "unauthorized",
+			"data":    nil,
+		})
+	}
+
+	var req model.UpdateProfileRequest
+	if err := c.Bind(&req); err != nil {
+		logger.Error(fmt.Errorf("failed to bind update profile request: %w", err))
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "invalid request body",
+			"data":    nil,
+		})
+	}
+
+	var user model.User
+	if err := h.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+				"success": false,
+				"message": "user not found",
+				"data":    nil,
+			})
+		}
+		logger.Error(fmt.Errorf("failed to find user: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "internal error",
+			"data":    nil,
+		})
+	}
+
+	updates := make(map[string]interface{})
+	if req.Name != "" {
+		updates["name"] = req.Name
+	}
+	if req.Avatar != "" {
+		compressed := utils.CompressImageBase64(req.Avatar)
+		if compressed != "" {
+			updates["avatar"] = compressed
+		}
+	}
+
+	if len(updates) > 0 {
+		if err := h.db.Model(&user).Updates(updates).Error; err != nil {
+			logger.Error(fmt.Errorf("failed to update user: %w", err))
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"success": false,
+				"message": "failed to update profile",
+				"data":    nil,
+			})
+		}
+		// Reload to get updated fields
+		_ = h.db.Where("id = ?", userID).First(&user)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "success",
+		"data":    userToResponse(user),
+	})
+}
+
+func (h *Handler) DeleteAccount(c echo.Context) error {
+	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
+
+	userID, ok := c.Get(middleware.UserIDKey).(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "unauthorized",
+			"data":    nil,
+		})
+	}
+
+	result := h.db.Where("id = ?", userID).Delete(&model.User{})
+	if result.Error != nil {
+		logger.Error(fmt.Errorf("failed to delete user: %w", result.Error))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "failed to delete account",
+			"data":    nil,
+		})
+	}
+	if result.RowsAffected == 0 {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"success": false,
+			"message": "user not found",
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "account deleted",
+		"data":    nil,
+	})
+}
+
 func userToResponse(u model.User) model.UserResponse {
 	return model.UserResponse{
 		ID:        u.ID,
 		Email:     u.Email,
 		Name:      u.Name,
+		Avatar:    u.Avatar,
 		CreatedAt: u.CreatedAt.Format(time.RFC3339),
 	}
 }

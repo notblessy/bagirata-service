@@ -18,7 +18,14 @@ type UserResponse struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
 	Name      string `json:"name"`
+	Avatar    string `json:"avatar,omitempty"` // base64 compressed image, empty if not set
 	CreatedAt string `json:"createdAt"`
+}
+
+// UpdateProfileRequest is the body for PATCH /auth/me
+type UpdateProfileRequest struct {
+	Name  string `json:"name"`
+	Avatar string `json:"avatar"` // base64-encoded image; backend compresses and stores
 }
 
 // AuthResponse is the response for login and register
