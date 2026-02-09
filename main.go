@@ -37,7 +37,7 @@ func main() {
 
 	postgres := db.NewPostgres()
 
-	postgres.AutoMigrate(&model.User{}, &model.SplitEntity{}, &model.Group{})
+	postgres.AutoMigrate(&model.User{}, &model.SplitEntity{}, &model.Group{}, &model.Dataset{})
 
 	openAi := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
@@ -88,6 +88,9 @@ func main() {
 	// Auth (no auth required for login/register)
 	e.POST("/login", h.Login)
 	e.POST("/register", h.Register)
+	// /auth/* routes for app compatibility (same handlers)
+	e.POST("/auth/login", h.Login)
+	e.POST("/auth/register", h.Register)
 	e.GET("/me", h.Me, requireAuth)
 
 	e.POST("/v1/recognize", h.Recognize)
