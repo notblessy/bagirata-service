@@ -282,20 +282,39 @@ func (s Splitted) FormattedGrandTotal() string {
 	return formatCurrency(s.GrandTotal)
 }
 
+// ToData builds SplitEntity from Splitted. UserID and CreatedAt are set by the handler when saving.
 func (s Splitted) ToData() SplitEntity {
 	data, _ := json.Marshal(s)
-
+	friendCount := len(s.Friends)
 	return SplitEntity{
-		ID:   s.ID,
-		Slug: s.Slug,
-		Data: data,
+		ID:          s.ID,
+		Slug:        s.Slug,
+		Data:        data,
+		Name:        s.Name,
+		GrandTotal:  s.GrandTotal,
+		FriendCount: friendCount,
 	}
 }
 
 type SplitEntity struct {
-	ID   string          `json:"id" gorm:"primaryKey"`
-	Slug string          `json:"slug" gorm:"unique"`
-	Data json.RawMessage `json:"data" gorm:"type:jsonb"`
+	ID         string          `json:"id" gorm:"primaryKey"`
+	Slug       string          `json:"slug" gorm:"unique"`
+	Data       json.RawMessage `json:"data" gorm:"type:jsonb"`
+	UserID      *string         `json:"userId,omitempty" gorm:"type:uuid;index"` // nil = anonymous split
+	Name        string          `json:"name" gorm:"index"`                      // denormalized for list
+	GrandTotal  float64         `json:"grandTotal"`                              // denormalized for list
+	FriendCount int             `json:"-" gorm:"column:friend_count"`           // denormalized for list
+	CreatedAt   time.Time       `json:"createdAt" gorm:"autoCreateTime"`
+}
+
+// SplitSummary is a single item in GET /v1/splits list response
+type SplitSummary struct {
+	ID          string  `json:"id"`
+	Slug        string  `json:"slug"`
+	Name        string  `json:"name"`
+	GrandTotal  float64 `json:"grandTotal"`
+	CreatedAt   string  `json:"createdAt"`
+	FriendCount int     `json:"friendCount"`
 }
 
 func (s SplitEntity) TableName() string {

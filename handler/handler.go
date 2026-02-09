@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/notblessy/middleware"
 	"github.com/notblessy/model"
 	"github.com/notblessy/utils"
 	"github.com/sashabaranov/go-openai"
@@ -115,6 +116,9 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 	}
 
 	entity := splitted.ToData()
+	if userID, ok := c.Get(middleware.UserIDKey).(string); ok && userID != "" {
+		entity.UserID = &userID
+	}
 
 	err := h.db.Save(&entity).Error
 	if err != nil {

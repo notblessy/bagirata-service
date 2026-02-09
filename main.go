@@ -8,9 +8,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomw "github.com/labstack/echo/v4/middleware"
 	"github.com/notblessy/db"
 	"github.com/notblessy/handler"
+	"github.com/notblessy/middleware"
 	"github.com/notblessy/model"
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
@@ -36,11 +37,18 @@ func main() {
 
 	postgres := db.NewPostgres()
 
-	postgres.AutoMigrate(&model.SplitEntity{})
+	postgres.AutoMigrate(&model.User{}, &model.SplitEntity{})
 
 	openAi := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
-	handler := handler.NewHandler(postgres, openAi)
+	h := handler.NewHandler(postgres, openAi)
+
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	if len(jwtSecret) == 0 {
+		jwtSecret = []byte("change-me-in-production")
+	}
+	requireAuth := middleware.RequireAuth(jwtSecret)
+	optionalAuth := middleware.OptionalAuth(jwtSecret)
 
 	t := &Template{
 		templates: template.Must(template.ParseGlob("views/*.html")),
@@ -53,17 +61,17 @@ func main() {
 
 	e.Renderer = t
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
-		Skipper: middleware.DefaultSkipper,
-		Store:   middleware.NewRateLimiterMemoryStore(20),
+	e.Use(echomw.Logger())
+	e.Use(echomw.RateLimiterWithConfig(echomw.RateLimiterConfig{
+		Skipper: echomw.DefaultSkipper,
+		Store:   echomw.NewRateLimiterMemoryStore(20),
 		IdentifierExtractor: func(c echo.Context) (string, error) {
 			return c.RealIP(), nil
 		},
 	}))
 
 	// implement cors
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	e.Use(echomw.CORSWithConfig(echomw.CORSConfig{
 		AllowOrigins:  []string{"*"},
 		AllowMethods:  []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
@@ -72,15 +80,21 @@ func main() {
 
 	e.RouteNotFound("*", notFound)
 
-	e.GET("/", handler.ViewLandingPage)
+	e.GET("/", h.ViewLandingPage)
 
-	e.GET("/view/:slug", handler.ViewSplitBySlug)
-	e.GET("/support/privacy", handler.ViewPrivacyPolicy)
+	e.GET("/view/:slug", h.ViewSplitBySlug)
+	e.GET("/support/privacy", h.ViewPrivacyPolicy)
 
-	e.POST("/v1/recognize", handler.Recognize)
+	// Auth (no auth required for login/register)
+	e.POST("/login", h.Login)
+	e.POST("/register", h.Register)
+	e.GET("/me", h.Me, requireAuth)
 
-	e.GET("/v1/splits/:slug", handler.FindSplitBySlug)
-	e.POST("/v1/splits", handler.SaveSplit)
+	e.POST("/v1/recognize", h.Recognize)
+
+	e.GET("/v1/splits", h.ListSplits, requireAuth)
+	e.GET("/v1/splits/:slug", h.FindSplitBySlug)
+	e.POST("/v1/splits", h.SaveSplit, optionalAuth)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
