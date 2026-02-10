@@ -226,6 +226,66 @@ func (h *Handler) UpdateGroup(c echo.Context) error {
 	})
 }
 
+// DeleteGroup deletes a group owned by the authenticated user.
+// It also detaches any splits that were assigned to this group.
+// DELETE /v1/groups/:id
+func (h *Handler) DeleteGroup(c echo.Context) error {
+	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
+
+	userID, ok := c.Get(middleware.UserIDKey).(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "unauthorized",
+			"data":    nil,
+		})
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "missing group id",
+			"data":    nil,
+		})
+	}
+
+	var g model.Group
+	if err := h.db.Where("id = ? AND user_id = ?", id, userID).First(&g).Error; err != nil {
+		logger.Error(fmt.Errorf("failed to get group: %w", err))
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"success": false,
+			"message": "group not found",
+			"data":    nil,
+		})
+	}
+
+	// Detach splits from this group (keep the splits, just clear group_id).
+	if err := h.db.Model(&model.SplitEntity{}).Where("group_id = ?", id).Update("group_id", nil).Error; err != nil {
+		logger.Error(fmt.Errorf("failed to detach splits from group: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "failed to delete group",
+			"data":    nil,
+		})
+	}
+
+	if err := h.db.Delete(&g).Error; err != nil {
+		logger.Error(fmt.Errorf("failed to delete group: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "failed to delete group",
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "success",
+		"data":    nil,
+	})
+}
+
 // GetGroup returns group metadata and list of splits in the group.
 // GET /v1/groups/:id
 func (h *Handler) GetGroup(c echo.Context) error {

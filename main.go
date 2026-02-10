@@ -102,12 +102,14 @@ func main() {
 	e.GET("/v1/splits", h.ListSplits, requireAuth)
 	e.GET("/v1/splits/:slug", h.FindSplitBySlug)
 	e.POST("/v1/splits", h.SaveSplit, optionalAuth)
+	e.DELETE("/v1/splits/:id", h.DeleteSplit, requireAuth)
 
 	e.GET("/v1/groups", h.ListGroups, requireAuth)
 	e.POST("/v1/groups", h.CreateGroup, requireAuth)
 	e.GET("/v1/groups/public/:slug", h.GetGroupByShareSlug)
 	e.GET("/v1/groups/:id", h.GetGroup, requireAuth)
 	e.PATCH("/v1/groups/:id", h.UpdateGroup, requireAuth)
+	e.DELETE("/v1/groups/:id", h.DeleteGroup, requireAuth)
 	e.GET("/v1/groups/:id/summary", h.GetGroupSummary, requireAuth)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))

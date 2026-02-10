@@ -91,3 +91,52 @@ func (h *Handler) ListSplits(c echo.Context) error {
 		"data":    list,
 	})
 }
+
+// DeleteSplit deletes a split by ID for the authenticated user.
+// DELETE /v1/splits/:id
+func (h *Handler) DeleteSplit(c echo.Context) error {
+	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
+
+	userID, ok := c.Get(middleware.UserIDKey).(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "unauthorized",
+			"data":    nil,
+		})
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "missing split id",
+			"data":    nil,
+		})
+	}
+
+	// Only delete splits that belong to this user.
+	res := h.db.Where("id = ? AND user_id = ?", id, userID).Delete(&model.SplitEntity{})
+	if res.Error != nil {
+		logger.Error(fmt.Errorf("failed to delete split %s: %w", id, res.Error))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "failed to delete split",
+			"data":    nil,
+		})
+	}
+
+	if res.RowsAffected == 0 {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"success": false,
+			"message": "split not found",
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "success",
+		"data":    nil,
+	})
+}
