@@ -92,9 +92,10 @@ func main() {
 	e.POST("/auth/login", h.Login)
 	e.POST("/auth/register", h.Register)
 	e.GET("/me", h.Me, requireAuth)
-	e.GET("/auth/me", h.Me, requireAuth)
-	e.PATCH("/auth/me", h.UpdateProfile, requireAuth)
-	e.DELETE("/auth/me", h.DeleteAccount, requireAuth)
+
+	e.GET("/v1/auth/me", h.Me, requireAuth)
+	e.PATCH("/v1/auth/me", h.UpdateProfile, requireAuth)
+	e.DELETE("/v1/auth/me", h.DeleteAccount, requireAuth)
 
 	e.POST("/v1/recognize", h.Recognize)
 
