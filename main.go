@@ -70,10 +70,10 @@ func main() {
 		},
 	}))
 
-	// implement cors
+	// implement cors (include PATCH for /auth/me profile update)
 	e.Use(echomw.CORSWithConfig(echomw.CORSConfig{
 		AllowOrigins:  []string{"*"},
-		AllowMethods:  []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowMethods:  []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
 		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		ExposeHeaders: []string{echo.HeaderContentType, echo.HeaderContentLength},
 	}))
