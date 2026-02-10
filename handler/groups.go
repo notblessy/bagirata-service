@@ -265,12 +265,22 @@ func (h *Handler) GetGroup(c echo.Context) error {
 
 	splits := make([]map[string]interface{}, 0, len(entities))
 	for _, e := range entities {
+		currencyCode := "IDR"
+		if len(e.Data) > 0 {
+			var partial struct {
+				CurrencyCode string `json:"currencyCode"`
+			}
+			if err := json.Unmarshal(e.Data, &partial); err == nil && partial.CurrencyCode != "" {
+				currencyCode = partial.CurrencyCode
+			}
+		}
 		splits = append(splits, map[string]interface{}{
-			"id":         e.ID,
-			"slug":       e.Slug,
-			"name":       e.Name,
-			"grandTotal": e.GrandTotal,
+			"id":           e.ID,
+			"slug":         e.Slug,
+			"name":         e.Name,
+			"grandTotal":   e.GrandTotal,
 			"createdAt":  e.CreatedAt.Format(time.RFC3339),
+			"currencyCode": currencyCode,
 		})
 	}
 
@@ -340,19 +350,21 @@ func (h *Handler) GetGroupSummary(c echo.Context) error {
 	splitsOut := make([]model.GroupSummarySplit, 0, len(entities))
 
 	for _, e := range entities {
-		splitsOut = append(splitsOut, model.GroupSummarySplit{
-			ID:         e.ID,
-			Slug:       e.Slug,
-			Name:       e.Name,
-			GrandTotal: e.GrandTotal,
-			CreatedAt:  e.CreatedAt.Format(time.RFC3339),
-		})
-
 		var s model.Splitted
+		currencyCode := "IDR"
 		if err := json.Unmarshal(e.Data, &s); err != nil {
 			logger.Warn(fmt.Errorf("failed to unmarshal split data %s: %w", e.ID, err))
-			continue
+		} else if s.CurrencyCode != "" {
+			currencyCode = s.CurrencyCode
 		}
+		splitsOut = append(splitsOut, model.GroupSummarySplit{
+			ID:           e.ID,
+			Slug:         e.Slug,
+			Name:         e.Name,
+			GrandTotal:   e.GrandTotal,
+			CreatedAt:    e.CreatedAt.Format(time.RFC3339),
+			CurrencyCode: currencyCode,
+		})
 
 		for _, f := range s.Friends {
 			key := f.FriendID
@@ -456,19 +468,21 @@ func (h *Handler) GetGroupByShareSlug(c echo.Context) error {
 	splitsOut := make([]model.GroupSummarySplit, 0, len(entities))
 
 	for _, e := range entities {
-		splitsOut = append(splitsOut, model.GroupSummarySplit{
-			ID:         e.ID,
-			Slug:       e.Slug,
-			Name:       e.Name,
-			GrandTotal: e.GrandTotal,
-			CreatedAt:  e.CreatedAt.Format(time.RFC3339),
-		})
-
 		var s model.Splitted
+		currencyCode := "IDR"
 		if err := json.Unmarshal(e.Data, &s); err != nil {
 			logger.Warn(fmt.Errorf("failed to unmarshal split data %s: %w", e.ID, err))
-			continue
+		} else if s.CurrencyCode != "" {
+			currencyCode = s.CurrencyCode
 		}
+		splitsOut = append(splitsOut, model.GroupSummarySplit{
+			ID:           e.ID,
+			Slug:         e.Slug,
+			Name:         e.Name,
+			GrandTotal:   e.GrandTotal,
+			CreatedAt:    e.CreatedAt.Format(time.RFC3339),
+			CurrencyCode: currencyCode,
+		})
 
 		for _, f := range s.Friends {
 			key := f.FriendID

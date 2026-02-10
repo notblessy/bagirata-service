@@ -52,11 +52,12 @@ type GroupSummaryParticipant struct {
 
 // GroupSummarySplit is a split that belongs to the group (for context in summary)
 type GroupSummarySplit struct {
-	ID         string  `json:"id"`
-	Slug       string  `json:"slug"`
-	Name       string  `json:"name"`
-	GrandTotal float64 `json:"grandTotal"`
-	CreatedAt  string  `json:"createdAt"`
+	ID           string  `json:"id"`
+	Slug         string  `json:"slug"`
+	Name         string  `json:"name"`
+	GrandTotal   float64 `json:"grandTotal"`
+	CreatedAt    string  `json:"createdAt"`
+	CurrencyCode string  `json:"currencyCode,omitempty"`
 }
 
 // GroupSummaryResponse is the response for GET /v1/groups/:id/summary

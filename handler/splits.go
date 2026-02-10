@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -64,13 +65,23 @@ func (h *Handler) ListSplits(c echo.Context) error {
 
 	list := make([]model.SplitSummary, 0, len(entities))
 	for _, e := range entities {
+		currencyCode := "IDR"
+		if len(e.Data) > 0 {
+			var partial struct {
+				CurrencyCode string `json:"currencyCode"`
+			}
+			if err := json.Unmarshal(e.Data, &partial); err == nil && partial.CurrencyCode != "" {
+				currencyCode = partial.CurrencyCode
+			}
+		}
 		list = append(list, model.SplitSummary{
-			ID:          e.ID,
-			Slug:        e.Slug,
-			Name:        e.Name,
-			GrandTotal:  e.GrandTotal,
-			CreatedAt:   e.CreatedAt.Format(time.RFC3339),
-			FriendCount: e.FriendCount,
+			ID:           e.ID,
+			Slug:         e.Slug,
+			Name:         e.Name,
+			GrandTotal:   e.GrandTotal,
+			CreatedAt:    e.CreatedAt.Format(time.RFC3339),
+			FriendCount:  e.FriendCount,
+			CurrencyCode: currencyCode,
 		})
 	}
 

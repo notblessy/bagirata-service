@@ -188,17 +188,18 @@ func (sf SplittedFriend) InitialName() string {
 }
 
 type Splitted struct {
-	Friends     []SplittedFriend `json:"friends"`
-	Slug        string           `json:"slug"`
-	ID          string           `json:"id"`
-	Name        string           `json:"name"`
-	BankName    string           `json:"bankName"`
-	BankAccount string           `json:"bankAccount"`
-	BankNumber  string           `json:"bankNumber"`
-	CreatedAt   string           `json:"createdAt"`
-	GrandTotal  float64          `json:"grandTotal"`
-	Subtotal    float64          `json:"subTotal"`
-	GroupID     *string          `json:"groupId,omitempty"` // optional; assign split to a group
+	Friends      []SplittedFriend `json:"friends"`
+	Slug         string           `json:"slug"`
+	ID           string           `json:"id"`
+	Name         string           `json:"name"`
+	BankName     string           `json:"bankName"`
+	BankAccount  string           `json:"bankAccount"`
+	BankNumber   string           `json:"bankNumber"`
+	CreatedAt    string           `json:"createdAt"`
+	GrandTotal   float64          `json:"grandTotal"`
+	Subtotal     float64          `json:"subTotal"`
+	CurrencyCode string           `json:"currencyCode"` // e.g. IDR, THB, JPY; stored and returned to clients
+	GroupID      *string          `json:"groupId,omitempty"` // optional; assign split to a group
 }
 
 func (s Splitted) TotalFriends() int {
@@ -311,12 +312,13 @@ type SplitEntity struct {
 
 // SplitSummary is a single item in GET /v1/splits list response
 type SplitSummary struct {
-	ID          string  `json:"id"`
-	Slug        string  `json:"slug"`
-	Name        string  `json:"name"`
-	GrandTotal  float64 `json:"grandTotal"`
-	CreatedAt   string  `json:"createdAt"`
+	ID           string  `json:"id"`
+	Slug         string  `json:"slug"`
+	Name         string  `json:"name"`
+	GrandTotal   float64 `json:"grandTotal"`
+	CreatedAt    string  `json:"createdAt"`
 	FriendCount int     `json:"friendCount"`
+	CurrencyCode string `json:"currencyCode,omitempty"` // e.g. IDR, THB; so clients can format amounts
 }
 
 func (s SplitEntity) TableName() string {
