@@ -49,6 +49,7 @@ func (h *Handler) ListGroups(c echo.Context) error {
 			"bankName":    g.BankName,
 			"bankAccount": g.BankAccount,
 			"bankNumber":  g.BankNumber,
+			"currencyCode": g.CurrencyCode,
 			"shareSlug":   g.ShareSlug,
 			"createdAt":   g.CreatedAt.Format(time.RFC3339),
 			"splitCount":  count,
@@ -94,13 +95,19 @@ func (h *Handler) CreateGroup(c echo.Context) error {
 		})
 	}
 
+	currencyCode := req.CurrencyCode
+	if currencyCode == "" {
+		currencyCode = "IDR"
+	}
+
 	g := model.Group{
-		ID:          uuid.New().String(),
-		UserID:      userID,
-		Name:        req.Name,
-		BankName:    req.BankName,
-		BankAccount: req.BankAccount,
-		BankNumber:  req.BankNumber,
+		ID:           uuid.New().String(),
+		UserID:       userID,
+		Name:         req.Name,
+		BankName:     req.BankName,
+		BankAccount:  req.BankAccount,
+		BankNumber:   req.BankNumber,
+		CurrencyCode: currencyCode,
 	}
 	if err := h.db.Create(&g).Error; err != nil {
 		logger.Error(fmt.Errorf("failed to create group: %w", err))
@@ -115,13 +122,14 @@ func (h *Handler) CreateGroup(c echo.Context) error {
 		"success": true,
 		"message": "success",
 		"data": map[string]interface{}{
-			"id":          g.ID,
-			"name":        g.Name,
-			"bankName":    g.BankName,
-			"bankAccount": g.BankAccount,
-			"bankNumber":  g.BankNumber,
-			"shareSlug":   g.ShareSlug,
-			"createdAt":   g.CreatedAt.Format(time.RFC3339),
+			"id":           g.ID,
+			"name":         g.Name,
+			"bankName":     g.BankName,
+			"bankAccount":  g.BankAccount,
+			"bankNumber":   g.BankNumber,
+			"currencyCode": g.CurrencyCode,
+			"shareSlug":    g.ShareSlug,
+			"createdAt":    g.CreatedAt.Format(time.RFC3339),
 		},
 	})
 }
@@ -182,6 +190,13 @@ func (h *Handler) UpdateGroup(c echo.Context) error {
 	if req.BankNumber != nil {
 		updates["bank_number"] = *req.BankNumber
 	}
+	if req.CurrencyCode != nil {
+		if *req.CurrencyCode == "" {
+			updates["currency_code"] = "IDR"
+		} else {
+			updates["currency_code"] = *req.CurrencyCode
+		}
+	}
 	if req.GenerateShareSlug != nil {
 		if *req.GenerateShareSlug {
 			slug := utils.RandomSlug(10)
@@ -215,13 +230,14 @@ func (h *Handler) UpdateGroup(c echo.Context) error {
 		"success": true,
 		"message": "success",
 		"data": map[string]interface{}{
-			"id":          g.ID,
-			"name":        g.Name,
-			"bankName":    g.BankName,
-			"bankAccount": g.BankAccount,
-			"bankNumber":  g.BankNumber,
-			"shareSlug":   g.ShareSlug,
-			"createdAt":   g.CreatedAt.Format(time.RFC3339),
+			"id":           g.ID,
+			"name":         g.Name,
+			"bankName":     g.BankName,
+			"bankAccount":  g.BankAccount,
+			"bankNumber":   g.BankNumber,
+			"currencyCode": g.CurrencyCode,
+			"shareSlug":    g.ShareSlug,
+			"createdAt":    g.CreatedAt.Format(time.RFC3339),
 		},
 	})
 }
@@ -339,7 +355,7 @@ func (h *Handler) GetGroup(c echo.Context) error {
 			"slug":         e.Slug,
 			"name":         e.Name,
 			"grandTotal":   e.GrandTotal,
-			"createdAt":  e.CreatedAt.Format(time.RFC3339),
+			"createdAt":    e.CreatedAt.Format(time.RFC3339),
 			"currencyCode": currencyCode,
 		})
 	}
@@ -348,14 +364,15 @@ func (h *Handler) GetGroup(c echo.Context) error {
 		"success": true,
 		"message": "success",
 		"data": map[string]interface{}{
-			"id":          g.ID,
-			"name":        g.Name,
-			"bankName":    g.BankName,
-			"bankAccount": g.BankAccount,
-			"bankNumber":  g.BankNumber,
-			"shareSlug":   g.ShareSlug,
-			"createdAt":   g.CreatedAt.Format(time.RFC3339),
-			"splits":      splits,
+			"id":           g.ID,
+			"name":         g.Name,
+			"bankName":     g.BankName,
+			"bankAccount":  g.BankAccount,
+			"bankNumber":   g.BankNumber,
+			"currencyCode": g.CurrencyCode,
+			"shareSlug":    g.ShareSlug,
+			"createdAt":    g.CreatedAt.Format(time.RFC3339),
+			"splits":       splits,
 		},
 	})
 }
@@ -459,6 +476,7 @@ func (h *Handler) GetGroupSummary(c echo.Context) error {
 	resp := model.GroupSummaryResponse{
 		ID:           g.ID,
 		Name:         g.Name,
+		CurrencyCode: g.CurrencyCode,
 		BankName:     g.BankName,
 		BankAccount:  g.BankAccount,
 		BankNumber:   g.BankNumber,
@@ -577,6 +595,7 @@ func (h *Handler) GetGroupByShareSlug(c echo.Context) error {
 	resp := model.GroupSummaryResponse{
 		ID:           g.ID,
 		Name:         g.Name,
+		CurrencyCode: g.CurrencyCode,
 		BankName:     g.BankName,
 		BankAccount:  g.BankAccount,
 		BankNumber:   g.BankNumber,

@@ -122,6 +122,14 @@ func (h *Handler) SaveSplit(c echo.Context) error {
 	if splitted.GroupID != nil && *splitted.GroupID != "" && entity.UserID != nil && *entity.UserID != "" {
 		var g model.Group
 		if err := h.db.Where("id = ? AND user_id = ?", *splitted.GroupID, *entity.UserID).First(&g).Error; err == nil {
+			// Validate that the group currency matches the split currency to prevent cross-currency groups.
+			if g.CurrencyCode != "" && g.CurrencyCode != splitted.CurrencyCode {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"success": false,
+					"message": "group currency does not match split currency",
+					"data":    nil,
+				})
+			}
 			entity.GroupID = splitted.GroupID
 		}
 	}
