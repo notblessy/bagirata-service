@@ -43,6 +43,11 @@ func (h *Handler) Recognize(c echo.Context) error {
 		})
 	}
 
+	logger.WithFields(logrus.Fields{
+		"scanned_text_length": len(request.Model),
+		"scanned_text":        request.Model,
+	}).Info("recognize: received scanned text")
+
 	resp, err := h.openAi.CreateChatCompletion(
 		c.Request().Context(),
 		openai.ChatCompletionRequest{

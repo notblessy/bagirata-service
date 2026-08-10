@@ -260,6 +260,93 @@ func (h *Handler) UpdateProfile(c echo.Context) error {
 	})
 }
 
+func (h *Handler) ChangePassword(c echo.Context) error {
+	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
+
+	userID, ok := c.Get(middleware.UserIDKey).(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "unauthorized",
+			"data":    nil,
+		})
+	}
+
+	var req model.ChangePasswordRequest
+	if err := c.Bind(&req); err != nil {
+		logger.Error(fmt.Errorf("failed to bind change password request: %w", err))
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "invalid request body",
+			"data":    nil,
+		})
+	}
+	if req.CurrentPassword == "" || req.NewPassword == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "current and new password are required",
+			"data":    nil,
+		})
+	}
+	if len(req.NewPassword) < 8 {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"success": false,
+			"message": "new password must be at least 8 characters",
+			"data":    nil,
+		})
+	}
+
+	var user model.User
+	if err := h.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+				"success": false,
+				"message": "user not found",
+				"data":    nil,
+			})
+		}
+		logger.Error(fmt.Errorf("failed to find user: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "internal error",
+			"data":    nil,
+		})
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.CurrentPassword)); err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"success": false,
+			"message": "current password is incorrect",
+			"data":    nil,
+		})
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		logger.Error(fmt.Errorf("failed to hash new password: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "internal error",
+			"data":    nil,
+		})
+	}
+
+	if err := h.db.Model(&user).Update("password", string(hashed)).Error; err != nil {
+		logger.Error(fmt.Errorf("failed to update password: %w", err))
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"success": false,
+			"message": "failed to change password",
+			"data":    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"message": "password changed",
+		"data":    nil,
+	})
+}
+
 func (h *Handler) DeleteAccount(c echo.Context) error {
 	logger := logrus.WithField("ctx", utils.Dump(c.Request().Context()))
 

@@ -28,6 +28,12 @@ type UpdateProfileRequest struct {
 	Avatar string `json:"avatar"` // base64-encoded image; backend compresses and stores
 }
 
+// ChangePasswordRequest is the body for PATCH /v1/auth/me/password
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"currentPassword"`
+	NewPassword     string `json:"newPassword"`
+}
+
 // AuthResponse is the response for login and register
 type AuthResponse struct {
 	Token string       `json:"token"`

@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -39,7 +40,7 @@ func (so SplittedOther) FormattedPrice() string {
 }
 
 func (so SplittedOther) GetFormula(multiplier float64) string {
-	return fmt.Sprintf("%d%% x %s", int64(so.Amount), formatNumber(multiplier))
+	return fmt.Sprintf("%d%% x %s", int64(math.Round(so.Amount)), formatNumber(multiplier))
 }
 
 type SplittedItem struct {
@@ -54,14 +55,14 @@ type SplittedItem struct {
 
 func (si SplittedItem) FormattedQty() string {
 	if si.Equal {
-		return fmt.Sprintf("%d x %s", int64(si.Price), formatNumber(si.Price/si.Qty))
+		return fmt.Sprintf("%d x %s", int64(math.Round(si.Price)), formatNumber(si.Price/si.Qty))
 	}
 
 	if si.Qty > 1 {
-		return fmt.Sprintf("%d x %s", int64(si.Qty), formatNumber(si.Price))
+		return fmt.Sprintf("%d x %s", int64(math.Round(si.Qty)), formatNumber(si.Price))
 	}
 
-	return fmt.Sprintf("%d x", int64(si.Qty))
+	return fmt.Sprintf("%d x", int64(math.Round(si.Qty)))
 }
 
 func (si SplittedItem) BaseSubTotal() float64 {
@@ -331,7 +332,7 @@ func formatCurrency(amount float64) string {
 
 // Helper function to format number with dot as thousand separator
 func formatNumber(n float64) string {
-	in := fmt.Sprintf("%d", int64(n))
+	in := fmt.Sprintf("%d", int64(math.Round(n)))
 	out := ""
 	for i, c := range in {
 		if i > 0 && (len(in)-i)%3 == 0 {
